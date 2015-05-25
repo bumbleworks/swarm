@@ -1,3 +1,5 @@
+require "pathname"
+
 module PathHelpers
   def spec_path
     Pathname.new(File.expand_path('..', File.dirname(__FILE__)))

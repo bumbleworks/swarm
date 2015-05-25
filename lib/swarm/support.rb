@@ -1,3 +1,5 @@
+require "securerandom"
+
 module Swarm
   module Support
     class << self
