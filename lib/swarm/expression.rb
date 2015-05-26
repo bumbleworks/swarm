@@ -58,6 +58,14 @@ module Swarm
       get_milestone("replied_at")
     end
 
+    def finished_at
+      get_milestone("finished_at")
+    end
+
+    def finished?
+      !!finished_at
+    end
+
     def node
       @node ||= parent.node_at_position(position)
     end

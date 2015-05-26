@@ -91,6 +91,30 @@ describe Swarm::Expression do
     end
   end
 
+  describe "#finished_at" do
+    it "returns time from finished_at milestone" do
+      subject.milestones = { "finished_at" => 123456789 }
+      expect(subject.finished_at).to eq(123456789)
+    end
+  end
+
+  describe "#finished?" do
+    it "returns true if finished_at not nil" do
+      subject.milestones = { "finished_at" => 123456789 }
+      expect(subject.finished?).to eq(true)
+    end
+
+    it "returns false if finished_at nil" do
+      subject.milestones = { "finished_at" => nil}
+      expect(subject.finished?).to eq(false)
+    end
+
+    it "returns false if finished_at missing" do
+      subject.milestones = {}
+      expect(subject.finished?).to eq(false)
+    end
+  end
+
   describe "#node" do
     it "returns node at expression's position from parent's tree" do
       subject.position = 8

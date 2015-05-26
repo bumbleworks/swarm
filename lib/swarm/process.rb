@@ -22,7 +22,16 @@ module Swarm
     end
 
     def root_expression
-      Expression.fetch(root_expression_id, hive: hive)
+      @root_expression ||= begin
+        reload! unless root_expression_id
+        if root_expression_id
+          Expression.fetch(root_expression_id, hive: hive)
+        end
+      end
+    end
+
+    def finished?
+      root_expression && root_expression.finished?
     end
 
     def node_at_position(position)

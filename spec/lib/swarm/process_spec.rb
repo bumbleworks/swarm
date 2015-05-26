@@ -57,12 +57,55 @@ describe Swarm::Process do
     end
   end
 
+  describe "#finished?" do
+    let(:root_expression) { Swarm::Expression.create(:hive => hive) }
+    it "returns true if root expression is finished" do
+      allow(root_expression).to receive(:finished?).and_return(true)
+      allow(subject).to receive(:root_expression).
+        and_return(root_expression)
+      expect(subject).to be_finished
+    end
+
+    it "returns false if root expression is not finished" do
+      allow(root_expression).to receive(:finished?).and_return(false)
+      allow(subject).to receive(:root_expression).
+        and_return(root_expression)
+      expect(subject).not_to be_finished
+    end
+
+    it "returns false if no root_expression" do
+      allow(subject).to receive(:root_expression).
+        and_return(nil)
+      expect(subject).not_to be_finished
+    end
+  end
+
   describe "#root_expression" do
-    it "fetches launched root expression" do
+    before(:each) do
       allow(Swarm::Expression).to receive(:fetch).
         with('456', :hive => hive).
         and_return(:the_expression)
+    end
+
+    it "fetches launched root expression" do
       allow(subject).to receive(:root_expression_id).and_return('456')
+      expect(subject.root_expression).to eq(:the_expression)
+    end
+
+    it "returns nil if no root_expression_id" do
+      allow(subject).to receive(:root_expression_id).and_return(nil)
+      expect(subject.root_expression).to be_nil
+    end
+
+    it "does not cache if not found" do
+      allow(subject).to receive(:root_expression_id).and_return(nil, nil, '456')
+      expect(subject.root_expression).to be_nil
+      expect(subject.root_expression).to eq(:the_expression)
+    end
+
+    it "reloads if root_expression_id nil" do
+      allow(subject).to receive(:root_expression_id).and_return(nil, '456')
+      expect(subject).to receive(:reload!)
       expect(subject.root_expression).to eq(:the_expression)
     end
   end
