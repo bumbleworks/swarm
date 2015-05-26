@@ -14,6 +14,10 @@ module Swarm
       end
     end
 
+    def ==(other)
+      other.is_a?(self.class) && other.to_hash == to_hash
+    end
+
     def storage_id
       self.class.storage_id_for_key(id)
     end
@@ -33,16 +37,19 @@ module Swarm
       self
     end
 
+    def attributes
+      self.class.columns.each_with_object({}) { |col_name, hsh|
+        value = instance_variable_get(:"@#{col_name}")
+        hsh[col_name.to_sym] = value
+      }
+    end
+
     def to_hash
       hsh = {
         :id => id,
         :type => self.class.name
       }
-      self.class.columns.each_with_object(hsh) { |col_name, hsh|
-        value = instance_variable_get(:"@#{col_name}")
-        hsh[col_name.to_sym] = value
-      }
-      hsh
+      hsh.merge(attributes)
     end
 
     def reload!
