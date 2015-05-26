@@ -1,4 +1,14 @@
 describe Swarm::Support do
+  describe ".symbolize_keys!" do
+    it "symbolizes keys in given hash" do
+      hsh = { :fancy => { "blue" => "green"}, "what" => 42 }
+      described_class.symbolize_keys!(hsh)
+      expect(hsh).to eq({
+        :fancy => { "blue" => "green"}, :what => 42
+      })
+    end
+  end
+
   describe '.camelize' do
     it 'turns underscored string into camelcase' do
       expect(described_class.camelize('foo_bar_One_two_3')).to eq('FooBarOneTwo3')

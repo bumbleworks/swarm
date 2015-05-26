@@ -29,10 +29,7 @@ module Swarm
     end
 
     def reify_from_hash(hsh)
-      hsh.keys.each do |key|
-        hsh[key.to_sym] = hsh.delete(key)
-      end
-
+      Support.symbolize_keys!(hsh)
       Swarm::Support.constantize(hsh.delete(:type)).new(
         hsh.merge(
           :hive => self

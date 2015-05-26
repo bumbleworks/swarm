@@ -15,6 +15,12 @@ module Swarm
         }
       end
 
+      def symbolize_keys!(hsh)
+        hsh.keys.each do |key|
+          hsh[key.to_sym] = hsh.delete(key)
+        end
+      end
+
       def uuid_with_timestamp
         "#{Time.now.strftime("%Y%m%d-%H%M%S")}-#{SecureRandom.uuid}"
       end
