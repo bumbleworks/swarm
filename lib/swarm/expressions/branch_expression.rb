@@ -17,11 +17,12 @@ module Swarm
     def add_child(at_position)
       raise InvalidPositionError unless tree[at_position]
       command = tree[at_position][0]
-      expression = hive.reify_from_hash(
+      klass = Swarm::Support.constantize("swarm/#{command}_expression")
+      expression = klass.create(
+        :hive => hive,
         :parent_id => id,
         :position => at_position,
         :workitem => workitem,
-        :type => Swarm::Support.camelize("#{command}_expression"),
         :process_id => process_id
       ).save
       (self.child_ids ||= []) << expression.id

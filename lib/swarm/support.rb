@@ -25,10 +25,17 @@ module Swarm
       end
 
       def constantize(string)
-        camelized = camelize(string)
-        camelized.split('::').inject(Object) { |scope, const|
-          scope.const_get(const)
-        }
+        name_parts = camelize(string).split('::')
+        name_parts.shift if name_parts.first.empty?
+        constant = Object
+
+        name_parts.each do |name_part|
+          const_defined_args = [name_part]
+          const_defined_args << false unless Module.method(:const_defined?).arity == 1
+          constant_defined = constant.const_defined?(*const_defined_args)
+          constant = constant_defined ? constant.const_get(name_part) : constant.const_missing(name_part)
+        end
+        constant
       end
     end
   end

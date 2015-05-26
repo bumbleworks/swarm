@@ -14,7 +14,7 @@ module Swarm
     end
 
     set_columns :parent_id, :position, :workitem, :child_ids, :milestones, :process_id
-    many_to_one :process
+    many_to_one :process, :class_name => "Swarm::Process"
 
     def root?
       process_id == parent_id

@@ -1,7 +1,7 @@
 module Swarm
   class Process < HiveDweller
     set_columns :process_definition_id, :workitem, :root_expression_id
-    many_to_one :process_definition
+    many_to_one :process_definition, :class_name => "Swarm::ProcessDefinition"
 
     def launch
       hive.queue('launch', self)

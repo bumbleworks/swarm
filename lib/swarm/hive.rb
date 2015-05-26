@@ -25,7 +25,7 @@ module Swarm
     end
 
     def fetch(klass, id)
-      Swarm.const_get(klass).fetch(id, hive: self)
+      Swarm::Support.constantize(klass).fetch(id, hive: self)
     end
 
     def reify_from_hash(hsh)
@@ -33,7 +33,7 @@ module Swarm
         hsh[key.to_sym] = hsh.delete(key)
       end
 
-      Swarm.const_get(hsh.delete(:type)).new(
+      Swarm::Support.constantize(hsh.delete(:type)).new(
         hsh.merge(
           :hive => self
         )

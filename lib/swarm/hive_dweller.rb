@@ -14,10 +14,6 @@ module Swarm
       end
     end
 
-    def demodularized_class_name
-      self.class.name.split("::").last
-    end
-
     def storage_id
       self.class.storage_id_for_key(id)
     end
@@ -40,7 +36,7 @@ module Swarm
     def to_hash
       hsh = {
         :id => id,
-        :type => demodularized_class_name
+        :type => self.class.name
       }
       self.class.columns.each_with_object(hsh) { |col_name, hsh|
         value = instance_variable_get(:"@#{col_name}")
@@ -65,8 +61,8 @@ module Swarm
         @columns = (@columns || []) | args
       end
 
-      def many_to_one(type)
-        klass = Swarm::Support.constantize("swarm/#{type}")
+      def many_to_one(type, class_name: nil)
+        klass = Swarm::Support.constantize("#{class_name || type}")
         define_method(type) do
           klass.fetch(self.send(:"#{type}_id"), :hive => hive)
         end
