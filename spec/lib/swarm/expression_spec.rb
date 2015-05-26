@@ -1,10 +1,10 @@
 describe Swarm::Expression do
-  subject { described_class.new(:hive => @hive, :process_id => '123', :parent_id => '456') }
+  subject { described_class.new(:hive => hive, :process_id => '123', :parent_id => '456') }
 
   describe "#process" do
     it "returns process for this expression" do
       allow(Swarm::Process).to receive(:fetch).
-        with('123', :hive => @hive).
+        with('123', :hive => hive).
         and_return(:the_process)
       expect(subject.process).to eq(:the_process)
     end
@@ -30,7 +30,7 @@ describe Swarm::Expression do
 
     it "returns parent expression if not root" do
       allow(Swarm::Expression).to receive(:fetch).
-        with('456', :hive => @hive).
+        with('456', :hive => hive).
         and_return(:the_parent_expression)
       expect(subject.parent).to eq(:the_parent_expression)
     end
@@ -38,7 +38,7 @@ describe Swarm::Expression do
 
   describe "#apply" do
     it "queues an apply of this expression in the hive" do
-      expect(@hive).to receive(:queue).with('apply', subject)
+      expect(hive).to receive(:queue).with('apply', subject)
       subject.apply
     end
   end
@@ -46,7 +46,7 @@ describe Swarm::Expression do
   describe "#reply" do
     it "saves and queues a reply of this expression in the hive" do
       expect(subject).to receive(:save).ordered
-      expect(@hive).to receive(:queue).with('reply', subject).ordered
+      expect(hive).to receive(:queue).with('reply', subject).ordered
       subject.reply
     end
   end

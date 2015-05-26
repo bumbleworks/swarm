@@ -1,11 +1,11 @@
 describe Swarm::Process do
-  let(:params) { { :hive => @hive, :process_definition_id => '123', :workitem => "the workitem"} }
+  let(:params) { { :hive => hive, :process_definition_id => '123', :workitem => "the workitem"} }
   subject { described_class.create(params) }
 
   describe "#process_definition" do
     it "returns process definition for this process" do
       allow(Swarm::ProcessDefinition).to receive(:fetch).
-        with('123', :hive => @hive).
+        with('123', :hive => hive).
         and_return(:the_definition)
       expect(subject.process_definition).to eq(:the_definition)
     end
@@ -13,7 +13,7 @@ describe Swarm::Process do
 
   describe "#launch" do
     it "queues a launch of this process in the hive" do
-      expect(@hive).to receive(:queue).with('launch', subject)
+      expect(hive).to receive(:queue).with('launch', subject)
       subject.launch
     end
   end
@@ -23,7 +23,7 @@ describe Swarm::Process do
     before(:each) do
       allow(Swarm::SequenceExpression).to receive(:create).
         with({
-          :hive => @hive,
+          :hive => hive,
           :parent_id => subject.id,
           :position => 0,
           :workitem => "the workitem",
@@ -60,7 +60,7 @@ describe Swarm::Process do
   describe "#root_expression" do
     it "fetches launched root expression" do
       allow(Swarm::Expression).to receive(:fetch).
-        with('456', :hive => @hive).
+        with('456', :hive => hive).
         and_return(:the_expression)
       allow(subject).to receive(:root_expression_id).and_return('456')
       expect(subject.root_expression).to eq(:the_expression)

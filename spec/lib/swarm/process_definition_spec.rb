@@ -1,6 +1,6 @@
 describe Swarm::ProcessDefinition do
   let(:json) { File.read(fixtures_path.join('process_definition.json')) }
-  subject { described_class.create_from_json(json, :hive => @hive) }
+  subject { described_class.create_from_json(json, :hive => hive) }
 
   describe ".create_from_json" do
     it "sets tree to parsed tree from JSON" do
@@ -8,7 +8,7 @@ describe Swarm::ProcessDefinition do
     end
 
     it "persists new definition in storage" do
-      retrieved_subject = described_class.fetch(subject.id, :hive => @hive)
+      retrieved_subject = described_class.fetch(subject.id, :hive => hive)
       expect(retrieved_subject.tree).to eq(JSON.parse(json))
     end
   end
@@ -27,7 +27,7 @@ describe Swarm::ProcessDefinition do
   describe "#create_process" do
     it "creates a new process from this definition" do
       allow(Swarm::Process).to receive(:create).with({
-        :hive => @hive,
+        :hive => hive,
         :process_definition_id => subject.id,
         :workitem => "the workitem"
       }).and_return(:the_process)
