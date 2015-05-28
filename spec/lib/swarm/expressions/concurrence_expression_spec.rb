@@ -20,7 +20,7 @@ describe Swarm::ConcurrenceExpression do
       end
     end
 
-    it "sets replied_at milestone and kicks off all children" do
+    it "sets applied_at milestone and kicks off all children" do
       expect(subject).to receive(:kick_off_children).with([0, 1])
       subject._apply
       expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
