@@ -1,7 +1,7 @@
 ["sequence", {}, [
   ["trace", { "first string": null }, []],
   ["trace", { "second string": null }, []],
-  ["concurrence", {"count": 2}, [
+  ["concurrence", {}, [
     ["trace", { "when will this appear": null }, []],
     ["trace", { "who knows": null }, []],
     ["sequence", {}, [
