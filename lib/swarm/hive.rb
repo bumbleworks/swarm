@@ -2,6 +2,8 @@ require_relative "storage"
 
 module Swarm
   class Hive
+    class MissingTypeError < StandardError; end
+
     attr_reader :storage, :work_queue
 
     def initialize(storage:, work_queue:)
@@ -30,6 +32,7 @@ module Swarm
 
     def reify_from_hash(hsh)
       Support.symbolize_keys!(hsh)
+      raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
       Swarm::Support.constantize(hsh.delete(:type)).new(
         hsh.merge(
           :hive => self
