@@ -126,4 +126,37 @@ describe Swarm::Expression do
       expect(subject.node).to eq(:a_node)
     end
   end
+
+  context "node part accessors" do
+    let(:node) { ["a_command", { :args => :foo }, [:fake, :tree]] }
+    before(:each) do
+      allow(subject).to receive(:node).and_return(node)
+    end
+
+    describe "#command" do
+      it "returns first element from node" do
+        expect(subject.command).to eq("a_command")
+      end
+    end
+
+    describe "#arguments" do
+      it "returns second element from node" do
+        expect(subject.arguments).to eq({ :args => :foo })
+      end
+    end
+
+    describe "#tree" do
+      it "returns third element from node" do
+        expect(subject.tree).to eq([:fake, :tree])
+      end
+    end
+
+    describe "#node_at_position" do
+      it "returns element from tree at given position" do
+        expect(subject.node_at_position(0)).to eq(:fake)
+        expect(subject.node_at_position(1)).to eq(:tree)
+        expect(subject.node_at_position(2)).to be_nil
+      end
+    end
+  end
 end
