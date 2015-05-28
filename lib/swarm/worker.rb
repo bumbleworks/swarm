@@ -6,29 +6,39 @@ module Swarm
 
     def initialize(hive:)
       @hive = hive
-      @beanstalk = hive.work_queue.client
-      @tube_name = hive.work_queue.name
-      @beanstalk.jobs.register(@tube_name) do |job|
-        work_on(JSON.parse(job.body))
+      @work_queue = hive.work_queue
+      @beaneater = @work_queue.client
+      @beaneater.jobs.register(@work_queue.name) do |job|
+        work_on(job)
       end
     end
 
     def run!
-      @beanstalk.jobs.process!
+      @beaneater.jobs.process!(:reserve_timeout => 1)
     end
 
-    def stop!
-      @beanstalk.jobs.stop!
+    def stop!(job)
+      if @work_queue.stats.current_watching == 1
+        job.delete
+      else
+        job.release(:delay => 1)
+      end
+      raise Beaneater::AbortProcessingError
     end
 
-    def work_on(data)
-      command = data["command"]
-      metadata = data["metadata"]
+    def run_command!(command, metadata)
       object = hive.fetch(metadata["type"], metadata["id"])
       object.send("_#{command}")
-    rescue StandardError => e
-      require 'pry'; binding.pry
-      raise
+    end
+
+    def work_on(job)
+      data = JSON.parse(job.body)
+      command, metadata = data.values_at("command", "metadata")
+      if command == "stop_worker"
+        stop!(job)
+      else
+        run_command!(command, metadata)
+      end
     end
   end
 end

@@ -18,4 +18,14 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+
+  config.around(:each, :type => :process) do |example|
+    hive.work_queue.clear
+    worker = Swarm::Worker.new(:hive => hive)
+    worker_thread = Thread.new {
+      worker.run!
+    }
+    example.run
+    hive.work_queue.put({:command => "stop_worker"}.to_json)
+  end
 end
