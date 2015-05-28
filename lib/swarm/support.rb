@@ -3,10 +3,10 @@ require "securerandom"
 module Swarm
   module Support
     class << self
-      def deep_merge(hsh1, hsh2)
+      def deep_merge(hsh1, hsh2, combine_arrays: :override)
         hsh1.merge(hsh2) { |key, v1, v2|
           if [v1, v2].all? { |v| v.is_a?(Array) }
-            v1 | v2
+            combine_arrays(v1, v2, method: combine_arrays)
           elsif [v1, v2].all? { |v| v.is_a?(Hash) }
             deep_merge(v1, v2)
           else
@@ -18,6 +18,19 @@ module Swarm
       def symbolize_keys!(hsh)
         hsh.keys.each do |key|
           hsh[key.to_sym] = hsh.delete(key)
+        end
+      end
+
+      def combine_arrays(v1, v2, method: :concat)
+        case method.to_s
+        when "uniq"
+          v1 | v2
+        when "concat"
+          v1.concat v2
+        when "override"
+          v2
+        else
+          raise ArgumentError, "unknown combination method: #{method}"
         end
       end
 
