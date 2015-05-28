@@ -4,7 +4,8 @@ describe Swarm::Worker do
   subject { described_class.new(hive: hive) }
 
   before(:each) {
-    allow(work_queue).to receive(:client).and_return(beaneater)
+    allow(work_queue).to receive(:clone).and_return(work_queue)
+    allow(work_queue).to receive(:beaneater).and_return(beaneater)
   }
 
   describe "#register_processor" do
@@ -18,7 +19,7 @@ describe Swarm::Worker do
   describe "#run!" do
     it "registers processor and starts processing jobs" do
       expect(subject).to receive(:register_processor)
-      expect(jobs).to receive(:process!).with(:reserve_timeout => 1)
+      expect(jobs).to receive(:process!)
       subject.run!
     end
   end
@@ -50,14 +51,14 @@ describe Swarm::Worker do
   describe "#clean_up_stop_job" do
     it "deletes the stop job if we're the only one watching" do
       job_double = double(Beaneater::Job)
-      allow(work_queue).to receive(:stats).and_return(double(:current_watching => 1))
+      allow(work_queue).to receive(:worker_count).and_return(1)
       expect(job_double).to receive(:delete)
       subject.clean_up_stop_job(job_double)
     end
 
     it "releases the stop job if others are watching" do
       job_double = double(Beaneater::Job)
-      allow(work_queue).to receive(:stats).and_return(double(:current_watching => 2))
+      allow(work_queue).to receive(:worker_count).and_return(2)
       expect(job_double).to receive(:release).with(:delay => 1)
       subject.clean_up_stop_job(job_double)
     end

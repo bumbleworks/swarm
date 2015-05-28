@@ -20,10 +20,10 @@ module Swarm
     end
 
     def queue(command, object)
-      @work_queue.put({
+      @work_queue.add_job({
         :command => command,
         :metadata => object.to_hash
-      }.to_json)
+      })
     end
 
     def fetch(klass, id)

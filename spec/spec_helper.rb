@@ -26,6 +26,6 @@ RSpec.configure do |config|
       worker.run!
     }
     example.run
-    hive.work_queue.put({:command => "stop_worker"}.to_json)
+    hive.work_queue.add_job({:command => "stop_worker"})
   end
 end

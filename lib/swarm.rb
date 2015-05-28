@@ -1,5 +1,6 @@
 require "swarm/version"
 require "swarm/support"
+require "swarm/work_queue"
 require "swarm/worker"
 require "swarm/hive"
 require "swarm/hive_dweller"

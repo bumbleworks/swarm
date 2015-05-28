@@ -6,8 +6,8 @@ module Swarm
 
     def initialize(hive:)
       @hive = hive
-      @work_queue = hive.work_queue
-      @beaneater = @work_queue.client
+      @work_queue = hive.work_queue.clone
+      @beaneater = @work_queue.beaneater
     end
 
     def register_processor
@@ -18,11 +18,11 @@ module Swarm
 
     def run!
       register_processor
-      @beaneater.jobs.process!(:reserve_timeout => 1)
+      @beaneater.jobs.process!
     end
 
     def clean_up_stop_job(job)
-      if @work_queue.stats.current_watching == 1
+      if @work_queue.worker_count == 1
         job.delete
       else
         job.release(:delay => 1)
