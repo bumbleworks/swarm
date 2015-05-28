@@ -1,7 +1,5 @@
 module Swarm
   class Expression < HiveDweller
-    class InvalidPositionError < StandardError; end;
-
     class << self
       def storage_type
         "Expression"
