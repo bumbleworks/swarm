@@ -91,18 +91,11 @@ describe Swarm::ConcurrenceExpression do
       expect(subject.array_combination_method).to eq("uniq")
     end
 
-    it "returns method from args if valid" do
+    it "returns method from args" do
       allow(subject).to receive(:arguments).and_return({"combine_arrays" => "override"})
       expect(subject.array_combination_method).to eq("override")
       allow(subject).to receive(:arguments).and_return({"combine_arrays" => "concat"})
       expect(subject.array_combination_method).to eq("concat")
-    end
-
-    it "raises exception if method not recognized" do
-      allow(subject).to receive(:arguments).and_return({"combine_arrays" => "fargo"})
-      expect {
-        subject.array_combination_method
-      }.to raise_error(ArgumentError, "unknown array combination method")
     end
   end
 end

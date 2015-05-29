@@ -26,13 +26,7 @@ module Swarm
     end
 
     def array_combination_method
-      method_from_args = arguments["combine_arrays"]
-      return "uniq" unless method_from_args
-      if ["uniq", "concat", "override"].include?(method_from_args.to_s)
-        method_from_args.to_s
-      else
-        raise ArgumentError, "unknown array combination method"
-      end
+      arguments["combine_arrays"] || "uniq"
     end
   end
 end

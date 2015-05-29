@@ -25,6 +25,12 @@ describe Swarm::Support do
         :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
       })
     end
+
+    it "raises exception if invalid array combination method requested" do
+      expect {
+        described_class.deep_merge(h1, h2, :combine_arrays => :iron_a_hat)
+      }.to raise_error(ArgumentError, "unknown array combination method: iron_a_hat")
+    end
   end
 
   describe ".symbolize_keys!" do

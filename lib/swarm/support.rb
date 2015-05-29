@@ -30,7 +30,7 @@ module Swarm
         when "override"
           v2
         else
-          raise ArgumentError, "unknown combination method: #{method}"
+          raise ArgumentError, "unknown array combination method: #{method}"
         end
       end
 
