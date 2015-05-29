@@ -33,7 +33,7 @@ module Swarm
     def reify_from_hash(hsh)
       Support.symbolize_keys!(hsh)
       raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
-      Swarm::Support.constantize(hsh.delete(:type)).new(
+      Swarm::Support.constantize(hsh.delete(:type)).new_from_storage(
         hsh.merge(
           :hive => self
         )

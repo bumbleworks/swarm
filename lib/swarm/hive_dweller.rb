@@ -2,16 +2,35 @@ module Swarm
   class HiveDweller
     attr_reader :hive, :id
 
-    def initialize(hive:, id: nil, **args)
+    def initialize(hive:, **args)
       @hive = hive
-      @id = id
+      @changed_attributes = {}
+      set_attributes(args, record_changes: false)
+    end
+
+    def new?
+      id.nil?
+    end
+
+    def changed?
+      !@changed_attributes.empty?
+    end
+
+    def set_attributes(args, record_changes: true)
       unknown_arguments = args.keys - self.class.columns
       unless unknown_arguments.empty?
         raise ArgumentError, "unknown keywords: #{unknown_arguments.join(', ')}"
       end
-      args.each do |key, val|
-        instance_variable_set(:"@#{key}", val)
+      args.each do |key, value|
+        change_attribute(key, value, record: record_changes)
       end
+    end
+
+    def change_attribute(key, value, record: true)
+      if record
+        @changed_attributes[key] = [send(key), value]
+      end
+      instance_variable_set(:"@#{key}", value)
     end
 
     def ==(other)
@@ -32,15 +51,16 @@ module Swarm
     end
 
     def save
-      @id ||= Swarm::Support.uuid_with_timestamp
-      storage[storage_id] = to_hash
+      if new? || changed?
+        @id ||= Swarm::Support.uuid_with_timestamp
+        storage[storage_id] = to_hash
+      end
       self
     end
 
     def attributes
       self.class.columns.each_with_object({}) { |col_name, hsh|
-        value = instance_variable_get(:"@#{col_name}")
-        hsh[col_name.to_sym] = value
+        hsh[col_name.to_sym] = send(:"#{col_name}")
       }
     end
 
@@ -57,6 +77,7 @@ module Swarm
       self.class.columns.each do |column|
         instance_variable_set(:"@#{column}", hsh[column.to_s])
       end
+      @changed_attributes = {}
       self
     end
 
@@ -64,7 +85,12 @@ module Swarm
       attr_reader :columns
 
       def set_columns(*args)
-        attr_accessor *args
+        attr_reader *args
+        args.each do |arg|
+          define_method("#{arg}=") { |value|
+            change_attribute(arg, value)
+          }
+        end
         @columns = (@columns || []) | args
       end
 
@@ -89,6 +115,13 @@ module Swarm
         else
           "#{storage_type}:#{key}"
         end
+      end
+
+      def new_from_storage(**args)
+        id = args.delete(:id)
+        new(**args).tap { |instance|
+          instance.instance_variable_set(:@id, id)
+        }
       end
 
       def fetch(key, hive:)

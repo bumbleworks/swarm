@@ -1,6 +1,6 @@
 describe Swarm::BranchExpression do
   subject {
-    described_class.new({
+    described_class.new_from_storage({
       :hive => hive,
       :id => 'foo',
       :workitem => { 'foo' => 'bar' },
@@ -15,11 +15,11 @@ describe Swarm::BranchExpression do
     end
 
     it "returns array of expressions for each child_id" do
-      expressions = ["1", "2", "3"].map { |id|
-        Swarm::Expression.create(:id => id, :hive => hive)
+      expressions = 3.times.collect { |id|
+        Swarm::Expression.create(:hive => hive)
       }
-      extra = Swarm::Expression.create(:id => "4", :hive => hive)
-      subject.child_ids = ["1", "2", "3"]
+      extra = Swarm::Expression.create(:hive => hive)
+      subject.child_ids = expressions.map(&:id)
       expect(subject.children).to match_array(expressions)
     end
   end

@@ -17,7 +17,7 @@ describe Swarm::Hive do
       hash = { "type" => "a_great_type", "other_thing" => "neat_thing" }
       allow(Swarm::Support).to receive(:constantize).with("a_great_type").
         and_return(klass_double)
-      expect(klass_double).to receive(:new).with({
+      expect(klass_double).to receive(:new_from_storage).with({
         :other_thing => "neat_thing",
         :hive => subject
       }).and_return(:the_item)

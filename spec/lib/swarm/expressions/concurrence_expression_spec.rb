@@ -1,6 +1,6 @@
 describe Swarm::ConcurrenceExpression do
   subject {
-    described_class.new({
+    described_class.new_from_storage({
       :hive => hive,
       :id => 'foo',
       :workitem => { 'foo' => 'bar' },

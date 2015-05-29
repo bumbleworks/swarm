@@ -5,7 +5,7 @@ describe Swarm::HiveDweller do
     }
   }
   subject {
-    test_class.new({
+    test_class.new_from_storage({
       :hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth"
     })
   }
@@ -20,12 +20,35 @@ describe Swarm::HiveDweller do
     end
 
     it "returns nil for any attributes not set" do
-      allow(test_class).to receive(:columns).and_return(
-        test_class.columns + [:alabama]
-      )
+      test_class.set_columns :alabama
       expect(subject.attributes).to eq(
         :horse => "fire", :rabbits => "earth", :alabama => nil
       )
+    end
+  end
+
+  describe "#new?" do
+    it "returns true for instance without id" do
+      expect(test_class.new(:hive => hive).new?).to eq(true)
+    end
+
+    it "returns false for instance with id" do
+      expect(subject.new?).to eq(false)
+    end
+  end
+
+  describe "#changed?" do
+    it "returns false if new" do
+      expect(test_class.new(:hive => hive).changed?).to eq(false)
+    end
+
+    it "returns false if no columns have changed" do
+      expect(subject.changed?).to eq(false)
+    end
+
+    it "returns true if columns have changed" do
+      subject.horse = "pony"
+      expect(subject.changed?).to eq(true)
     end
   end
 
@@ -36,10 +59,10 @@ describe Swarm::HiveDweller do
   end
 
   describe "#save" do
-    it "stores self in storage" do
-      allow(subject).to receive(:to_hash).and_return({ :foo => :bar })
+    it "stores self in storage if change" do
+      subject.horse = "pony"
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:1234", subject.to_hash)
       subject.save
-      expect(hive.storage["AluminumHead:1234"]).to eq({ "foo" => "bar" })
     end
 
     it "generates id before saving if nonexistent" do
@@ -49,6 +72,19 @@ describe Swarm::HiveDweller do
         and_return("123-345-567")
       subject.save
       expect(hive.storage["AluminumHead:123-345-567"]).to eq({ "foo" => "bar" })
+    end
+
+    it "saves if new" do
+      new_object = test_class.new(:hive => hive)
+      allow(Swarm::Support).to receive(:uuid_with_timestamp).
+        and_return("9999")
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999", new_object.to_hash.merge(:id => "9999"))
+      new_object.save
+    end
+
+    it "does nothing if no change and not new" do
+      expect(hive.storage).not_to receive(:[]=)
+      subject.save
     end
   end
 
@@ -77,17 +113,40 @@ describe Swarm::HiveDweller do
       subject.reload!
       expect(subject.horse).to eq("snoot")
     end
+
+    it "resets changed? to false" do
+      hive.storage["AluminumHead:1234"] = subject.to_hash
+      subject.horse = "snoot"
+      expect(subject).to be_changed
+      subject.reload!
+      expect(subject).not_to be_changed
+    end
   end
 
   describe ".new" do
     it "returns a new instance with columns set" do
-      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth")
+      instance = test_class.new(:hive => hive, :horse => "fire", :rabbits => "earth")
+      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth")
     end
 
     it "raises an ArgumentError if any arguments are not columns" do
       expect {
         test_class.new(:hive => hive, :horse => "fire", :lemons => "sweet")
       }.to raise_error(ArgumentError, "unknown keywords: lemons")
+    end
+
+    it "does not allow directly setting id" do
+      expect {
+        test_class.new(:hive => hive, :id => "secret_hack", :horse => "fire")
+      }.to raise_error(ArgumentError, "unknown keywords: id")
+    end
+  end
+
+  describe ".new_from_storage" do
+    it "returns a new instance with id set" do
+      instance = test_class.new_from_storage(:hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth")
+      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth")
+      expect(subject.id).to eq("1234")
     end
   end
 

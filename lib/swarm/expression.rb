@@ -87,7 +87,7 @@ module Swarm
   private
 
     def set_milestone(name, at: Time.now.to_i)
-      (self.milestones ||= {})[name] = at
+      self.milestones = (milestones || {}).merge(name => at)
     end
 
     def get_milestone(name)
