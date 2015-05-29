@@ -1,12 +1,12 @@
 describe Swarm::Support do
   describe ".deep_merge" do
-    let(:h1) { { :foo => :bar, :baz => [1, 2, 3], :crayons => { :brand => :crayola } } }
-    let(:h2) { { :baz => [3, 4], :crayons => { :number => 4 } } }
+    let(:h1) { { :foo => :bar, :baz => [1, 2, 3], :crayons => { :brand => :crayola, :smell => :yucky } } }
+    let(:h2) { { :baz => [3, 4], :crayons => { :number => 4, :smell => :so_good } } }
     it "deep merges hashes and overrides arrays by default" do
       expect(described_class.deep_merge(h1, h2)).to eq({
         :foo => :bar,
         :baz => [3, 4],
-        :crayons => { :brand => :crayola, :number => 4 }
+        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
       })
     end
 
@@ -14,7 +14,7 @@ describe Swarm::Support do
       expect(described_class.deep_merge(h1, h2, :combine_arrays => :concat)).to eq({
         :foo => :bar,
         :baz => [1, 2, 3, 3, 4],
-        :crayons => { :brand => :crayola, :number => 4 }
+        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
       })
     end
 
@@ -22,7 +22,7 @@ describe Swarm::Support do
       expect(described_class.deep_merge(h1, h2, :combine_arrays => :uniq)).to eq({
         :foo => :bar,
         :baz => [1, 2, 3, 4],
-        :crayons => { :brand => :crayola, :number => 4 }
+        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
       })
     end
   end
