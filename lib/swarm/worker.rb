@@ -8,21 +8,28 @@ module Swarm
       @hive = hive
       @work_queue = hive.work_queue
       @beaneater = @work_queue.client
+    end
+
+    def register_processor
       @beaneater.jobs.register(@work_queue.name) do |job|
         work_on(job)
       end
     end
 
     def run!
+      register_processor
       @beaneater.jobs.process!(:reserve_timeout => 1)
     end
 
-    def stop!(job)
+    def clean_up_stop_job(job)
       if @work_queue.stats.current_watching == 1
         job.delete
       else
         job.release(:delay => 1)
       end
+    end
+
+    def stop!
       raise Beaneater::AbortProcessingError
     end
 
@@ -35,7 +42,8 @@ module Swarm
       data = JSON.parse(job.body)
       command, metadata = data.values_at("command", "metadata")
       if command == "stop_worker"
-        stop!(job)
+        clean_up_stop_job(job)
+        stop!
       else
         run_command!(command, metadata)
       end
