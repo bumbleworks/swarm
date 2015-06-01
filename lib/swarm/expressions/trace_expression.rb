@@ -1,9 +1,9 @@
 module Swarm
   class TraceExpression < Expression
-    def _apply
-      set_milestone("applied_at")
-      workitem["traced"] ||= []
-      workitem["traced"] << arguments.keys.first
+    def work
+      traced = workitem["traced"] || []
+      traced += [arguments.keys.first]
+      self.workitem = workitem.merge("traced" => traced)
       hive.trace(arguments.keys.first)
       save
       reply

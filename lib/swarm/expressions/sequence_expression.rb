@@ -2,8 +2,7 @@ require_relative "branch_expression"
 
 module Swarm
   class SequenceExpression < BranchExpression
-    def _apply
-      set_milestone("applied_at")
+    def work
       kick_off_children([0])
     end
 

@@ -37,6 +37,8 @@ module Swarm
 
     def _apply
       set_milestone("applied_at")
+      work
+      save
     end
 
     def _reply

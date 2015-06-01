@@ -13,17 +13,10 @@ describe Swarm::ConcurrenceExpression do
     allow(subject).to receive(:node).and_return(["concurrence", {}, [:a, :b]])
   end
 
-  describe "#_apply" do
-    around(:each) do |example|
-      Timecop.freeze do
-        example.run
-      end
-    end
-
-    it "sets applied_at milestone and kicks off all children" do
+  describe "#work" do
+    it "kicks off all children" do
       expect(subject).to receive(:kick_off_children).with([0, 1])
-      subject._apply
-      expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
+      subject.work
     end
   end
 

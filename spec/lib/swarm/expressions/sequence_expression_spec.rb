@@ -13,17 +13,10 @@ describe Swarm::SequenceExpression do
     allow(subject).to receive(:node).and_return(["sequence", {}, [:a, :b]])
   end
 
-  describe "#_apply" do
-    around(:each) do |example|
-      Timecop.freeze do
-        example.run
-      end
-    end
-
-    it "sets applied_at milestone and kicks off first child" do
+  describe "#work" do
+    it "kicks off first child" do
       expect(subject).to receive(:kick_off_children).with([0])
-      subject._apply
-      expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
+      subject.work
     end
   end
 

@@ -43,6 +43,21 @@ describe Swarm::Expression do
     end
   end
 
+  describe "#_apply" do
+    around(:each) do |example|
+      Timecop.freeze do
+        example.run
+      end
+    end
+
+    it "sets applied_at milestone, calls #work, and saves" do
+      expect(subject).to receive(:work).ordered
+      expect(subject).to receive(:save).ordered
+      subject._apply
+      expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
+    end
+  end
+
   describe "#reply" do
     it "saves and queues a reply of this expression in the hive" do
       expect(subject).to receive(:save).ordered

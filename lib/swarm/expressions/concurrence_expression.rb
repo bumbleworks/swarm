@@ -2,8 +2,7 @@ require_relative "branch_expression"
 
 module Swarm
   class ConcurrenceExpression < BranchExpression
-    def _apply
-      set_milestone("applied_at")
+    def work
       kick_off_children(tree.each_index.to_a)
     end
 
