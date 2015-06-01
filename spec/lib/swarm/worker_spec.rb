@@ -1,25 +1,30 @@
 describe Swarm::Worker do
-  let(:jobs) { double(Beaneater::Jobs) }
-  let(:beaneater) { double(Beaneater, :jobs => jobs) }
   subject { described_class.new(hive: hive) }
 
   before(:each) {
     allow(work_queue).to receive(:clone).and_return(work_queue)
-    allow(work_queue).to receive(:beaneater).and_return(beaneater)
   }
 
-  describe "#register_processor" do
-    it "sets up processor" do
-      allow(jobs).to receive(:register).with("swarm-test-queue").and_yield(:a_job)
-      expect(subject).to receive(:work_on).with(:a_job)
-      subject.register_processor
+  describe "#working?" do
+    it "returns true if working variable true" do
+      subject.instance_variable_set(:@working, true)
+      expect(subject).to be_working
+    end
+
+    it "returns false if working variable false" do
+      subject.instance_variable_set(:@working, false)
+      expect(subject).not_to be_working
+    end
+
+    it "returns false by default" do
+      expect(subject).not_to be_working
     end
   end
 
   describe "#run!" do
-    it "registers processor and starts processing jobs" do
-      expect(subject).to receive(:register_processor)
-      expect(jobs).to receive(:process!)
+    it "processes jobs while working" do
+      expect(subject).to receive(:process_next_job).twice
+      expect(subject).to receive(:working?).and_return(true, true, false)
       subject.run!
     end
   end
@@ -42,33 +47,53 @@ describe Swarm::Worker do
 
     it "stops worker and cleans up if job contains special 'stop_worker' command" do
       job = double(:body => { "command" => "stop_worker" }.to_json)
-      expect(subject).to receive(:clean_up_stop_job).ordered
+      expect(work_queue).to receive(:remove_worker).with(subject, :stop_job => job).ordered
       expect(subject).to receive(:stop!).ordered
       subject.work_on(job)
     end
   end
 
-  describe "#clean_up_stop_job" do
-    it "deletes the stop job if we're the only one watching" do
-      job_double = double(Beaneater::Job)
-      allow(work_queue).to receive(:worker_count).and_return(1)
-      expect(job_double).to receive(:delete)
-      subject.clean_up_stop_job(job_double)
+  describe "#process_next_job" do
+    it "reserves, works on, deletes, and cleans up the next job in the queue" do
+      allow(work_queue).to receive(:reserve_job).and_return(:the_job)
+      expect(subject).to receive(:work_on).with(:the_job)
+      expect(work_queue).to receive(:delete_job).with(:the_job)
+      expect(work_queue).to receive(:clean_up_job).with(:the_job)
+      subject.process_next_job
     end
 
-    it "releases the stop job if others are watching" do
-      job_double = double(Beaneater::Job)
-      allow(work_queue).to receive(:worker_count).and_return(2)
-      expect(job_double).to receive(:release).with(:delay => 1)
-      subject.clean_up_stop_job(job_double)
+    it "retries if job reservation fails" do
+      expect(work_queue).to receive(:reserve_job).and_raise(Swarm::WorkQueue::JobReservationFailed).twice
+      expect(work_queue).to receive(:reserve_job).and_return(:the_job)
+      expect(subject).to receive(:work_on).with(:the_job)
+      expect(work_queue).to receive(:delete_job).with(:the_job)
+      expect(work_queue).to receive(:clean_up_job).with(:the_job)
+      subject.process_next_job
+    end
+
+    it "does nothing if non-retry error occurs while reserving" do
+      expect(work_queue).to receive(:reserve_job).and_raise(ArgumentError)
+      expect(subject).to receive(:work_on).never
+      expect(work_queue).to receive(:bury_job).never
+      subject.process_next_job
+    end
+
+    it "buries and cleans up job if other error occurs while working" do
+      expect(work_queue).to receive(:reserve_job).and_return(:the_job)
+      expect(subject).to receive(:work_on).with(:the_job).and_raise(ArgumentError)
+      expect(work_queue).to receive(:bury_job).with(:the_job)
+      expect(work_queue).to receive(:clean_up_job).with(:the_job)
+      subject.process_next_job
     end
   end
 
   describe "#stop!" do
-    it "raises Beaneater::AbortProcessingError to signal Beaneater to break from cycle" do
-      expect {
-        subject.stop!
-      }.to raise_error(Beaneater::AbortProcessingError)
+    it "sets working to false and clears current job" do
+      subject.instance_variable_set(:@working, true)
+      subject.instance_variable_set(:@current_job, :a_job)
+      subject.stop!
+      expect(subject).not_to be_working
+      expect(subject.instance_variable_get(:@current_job)).to be_nil
     end
   end
 end
