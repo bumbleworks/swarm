@@ -4,6 +4,8 @@ module Swarm
   class WorkQueue
     class JobReservationFailed < StandardError; end
 
+    attr_reader :tube, :name
+
     def initialize(name:, address: "localhost:11300")
       @name = name
       @address = address
@@ -12,11 +14,11 @@ module Swarm
     end
 
     def add_job(hsh)
-      @tube.put(hsh.to_json)
+      tube.put(hsh.to_json)
     end
 
     def reserve_job
-      @tube.reserve(1)
+      tube.reserve
     rescue Beaneater::JobNotReserved, Beaneater::NotFoundError, Beaneater::TimedOutError
       raise JobReservationFailed
     end
@@ -33,8 +35,8 @@ module Swarm
       job.bury if job.exists? && job.reserved?
     end
 
-    def remove_worker(worker, stop_job: job)
-      if worker_count == 1
+    def remove_worker(worker, stop_job:)
+      if worker_count <= 1
         stop_job.delete
       else
         stop_job.release
@@ -42,11 +44,11 @@ module Swarm
     end
 
     def worker_count
-      @tube.stats.current_watching
+      tube.stats.current_watching
     end
 
     def clear
-      @tube.clear
+      tube.clear
     end
 
     def clone
