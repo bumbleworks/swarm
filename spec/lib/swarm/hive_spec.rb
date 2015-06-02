@@ -1,4 +1,4 @@
-describe Swarm::Hive do
+RSpec.describe Swarm::Hive do
   subject { hive }
 
   describe "#fetch" do

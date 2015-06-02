@@ -1,4 +1,4 @@
-describe Swarm::HiveDweller do
+RSpec.describe Swarm::HiveDweller do
   let(:test_class) {
     Class.new(described_class).tap { |klass|
       klass.set_columns :horse, :rabbits

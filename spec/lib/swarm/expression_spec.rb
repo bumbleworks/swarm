@@ -1,4 +1,4 @@
-describe Swarm::Expression do
+RSpec.describe Swarm::Expression do
   subject { described_class.new(:hive => hive, :process_id => '123', :parent_id => '456') }
 
   describe "#process" do

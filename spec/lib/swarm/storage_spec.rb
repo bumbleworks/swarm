@@ -1,4 +1,4 @@
-describe Swarm::Storage do
+RSpec.describe Swarm::Storage do
   let(:backend) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
   subject { described_class.new(backend) }
 

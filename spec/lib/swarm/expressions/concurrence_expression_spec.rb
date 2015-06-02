@@ -1,4 +1,4 @@
-describe Swarm::ConcurrenceExpression do
+RSpec.describe Swarm::ConcurrenceExpression do
   subject {
     described_class.new_from_storage({
       :hive => hive,

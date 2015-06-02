@@ -1,4 +1,4 @@
-describe Swarm::SequenceExpression do
+RSpec.describe Swarm::SequenceExpression do
   subject {
     described_class.new_from_storage({
       :hive => hive,

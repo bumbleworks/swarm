@@ -1,4 +1,4 @@
-describe Swarm::Support do
+RSpec.describe Swarm::Support do
   describe ".deep_merge" do
     let(:h1) { { :foo => :bar, :baz => [1, 2, 3], :crayons => { :brand => :crayola, :smell => :yucky } } }
     let(:h2) { { :baz => [3, 4], :crayons => { :number => 4, :smell => :so_good } } }

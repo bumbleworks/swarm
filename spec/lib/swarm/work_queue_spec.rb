@@ -1,4 +1,4 @@
-describe Swarm::WorkQueue do
+RSpec.describe Swarm::WorkQueue do
   let(:job) { instance_double(Beaneater::Job) }
   subject { work_queue }
 
@@ -10,7 +10,7 @@ describe Swarm::WorkQueue do
   end
 
   describe "#reserve_job" do
-    RSpec.shared_examples "a job reservation failure" do |reservation_exception|
+    shared_examples "a job reservation failure" do |reservation_exception|
       it "raises JobReservationFailed exception when #{reservation_exception.class} raised" do
         allow(subject.tube).to receive(:reserve).and_raise(reservation_exception)
         expect {

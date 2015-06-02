@@ -10,6 +10,7 @@ require './lib/swarm'
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
+  config.expose_dsl_globally = false
   config.include PathHelpers
   config.include ProcessHelpers
 

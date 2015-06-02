@@ -1,4 +1,4 @@
-describe Swarm::Process do
+RSpec.describe Swarm::Process do
   let(:params) { { :hive => hive, :process_definition_id => '123', :workitem => "the workitem"} }
   subject { described_class.create(params) }
 

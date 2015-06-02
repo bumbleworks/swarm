@@ -1,4 +1,4 @@
-describe Swarm::Worker do
+RSpec.describe Swarm::Worker do
   subject { described_class.new(hive: hive) }
 
   before(:each) {

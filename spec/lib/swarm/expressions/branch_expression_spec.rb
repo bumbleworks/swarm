@@ -1,4 +1,4 @@
-describe Swarm::BranchExpression do
+RSpec.describe Swarm::BranchExpression do
   subject {
     described_class.new_from_storage({
       :hive => hive,
