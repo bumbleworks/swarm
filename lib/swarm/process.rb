@@ -1,7 +1,15 @@
+require "timeout"
+
 module Swarm
   class Process < HiveDweller
     set_columns :process_definition_id, :workitem, :root_expression_id
     many_to_one :process_definition, :class_name => "Swarm::ProcessDefinition"
+
+    def wait_until_finished(timeout: 5)
+      Timeout::timeout(timeout) do
+        sleep 0.05 until finished?
+      end
+    end
 
     def launch
       hive.queue('launch', self)

@@ -2,6 +2,20 @@ RSpec.describe Swarm::Process do
   let(:params) { { :hive => hive, :process_definition_id => '123', :workitem => "the workitem"} }
   subject { described_class.create(params) }
 
+  describe "#wait_until_finished" do
+    it "waits until finished" do
+      allow(subject).to receive(:finished?).and_return(false, true)
+      subject.wait_until_finished
+    end
+
+    it "times out if not finished in time" do
+      allow(subject).to receive(:finished?).and_return(false)
+      expect {
+        subject.wait_until_finished(:timeout => 0.05)
+      }.to raise_error(Timeout::Error)
+    end
+  end
+
   describe "#process_definition" do
     it "returns process definition for this process" do
       allow(Swarm::ProcessDefinition).to receive(:fetch).

@@ -1,5 +1,5 @@
 RSpec.describe Swarm::ProcessDefinition do
-  let(:json) { File.read(fixtures_path.join('process_definition.json')) }
+  let(:json) { File.read(fixtures_path.join('trace_process.json')) }
   subject { described_class.create_from_json(json, :hive => hive) }
 
   describe ".create_from_json" do
