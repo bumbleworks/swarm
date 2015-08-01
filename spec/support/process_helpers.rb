@@ -4,7 +4,7 @@ module ProcessHelpers
   end
 
   def work_queue
-    @work_queue ||= Swarm::WorkQueue.new(:name => "swarm-test-queue", :address => "localhost:11300")
+    @work_queue ||= Swarm::Engine::WorkQueue.new(:name => "swarm-test-queue", :address => "localhost:11300")
   end
 
   def hive

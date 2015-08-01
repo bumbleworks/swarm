@@ -1,4 +1,4 @@
-RSpec.describe Swarm::Worker do
+RSpec.describe Swarm::Engine::Worker do
   subject { described_class.new(hive: hive) }
 
   before(:each) {
@@ -63,7 +63,7 @@ RSpec.describe Swarm::Worker do
     end
 
     it "retries if job reservation fails" do
-      expect(work_queue).to receive(:reserve_job).and_raise(Swarm::WorkQueue::JobReservationFailed).twice
+      expect(work_queue).to receive(:reserve_job).and_raise(Swarm::Engine::WorkQueue::JobReservationFailed).twice
       expect(work_queue).to receive(:reserve_job).and_return(:the_job)
       expect(subject).to receive(:work_on).with(:the_job)
       expect(work_queue).to receive(:delete_job).with(:the_job)

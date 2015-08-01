@@ -12,4 +12,4 @@ hive = Swarm::Hive.new(:storage => storage, :work_queue => work_queue)
 work_queue.clear
 redis.flushall
 
-Swarm::Worker.new(:hive => hive).run!
+Swarm::Engine::Worker.new(:hive => hive).run!

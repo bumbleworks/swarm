@@ -22,7 +22,7 @@ RSpec.configure do |config|
 
   config.around(:each, :type => :process) do |example|
     hive.work_queue.clear
-    worker = Swarm::Worker.new(:hive => hive)
+    worker = Swarm::Engine::Worker.new(:hive => hive)
     worker_thread = Thread.new {
       worker.run!
     }

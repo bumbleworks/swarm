@@ -1,4 +1,4 @@
-RSpec.describe Swarm::WorkQueue do
+RSpec.describe Swarm::Engine::WorkQueue do
   let(:job) { instance_double(Beaneater::Job) }
   subject { work_queue }
 
