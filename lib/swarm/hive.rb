@@ -11,6 +11,10 @@ module Swarm
       @work_queue = work_queue
     end
 
+    def inspect
+      "#<Swarm::Hive storage: #{storage.backend.class}, work_queue: #{work_queue.name}>"
+    end
+
     def traced
       storage["trace"] ||= []
     end

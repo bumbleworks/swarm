@@ -11,6 +11,15 @@ RSpec.describe Swarm::Hive do
     end
   end
 
+
+  describe "#inspect" do
+    it "reveals storage class and work queue name" do
+      expect(subject.inspect).to eq(
+        "#<Swarm::Hive storage: Hash, work_queue: swarm-test-queue>"
+      )
+    end
+  end
+
   describe "#reify_from_hash" do
     it "constantizes type from hash and instantiates new object" do
       klass_double = double
