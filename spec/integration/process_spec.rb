@@ -11,12 +11,20 @@ RSpec.describe Swarm::Process, :type => :process do
       expect(hive.traced).to eq([
         "first string",
         "second string",
-        "when will this appear",
-        "who knows",
         "third string",
         "fourth string",
         "final string"
       ])
+    end
+  end
+
+  context "with concurrence block" do
+    let(:fixture_path) { fixtures_path.join('concurrence_process.json') }
+
+    it "calls all children concurrently" do
+      subject
+      wait_until { Swarm::StoredWorkitem.all(hive: hive).count == 2 }
+      expect(Swarm::StoredWorkitem.all(hive: hive).map(&:command)).to eq(["defer", "defer"])
     end
   end
 end

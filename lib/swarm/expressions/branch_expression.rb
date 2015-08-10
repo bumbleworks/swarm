@@ -1,3 +1,5 @@
+require_relative "../router"
+
 module Swarm
   class BranchExpression < Expression
     class InvalidPositionError < StandardError; end;
@@ -21,18 +23,22 @@ module Swarm
     end
 
     def add_child(at_position)
-      raise InvalidPositionError unless tree[at_position]
-      command = tree[at_position][0]
-      klass = Swarm::Support.constantize("swarm/#{command}_expression")
+      node = tree[at_position]
+      raise InvalidPositionError unless node
+      expression = create_child_expression(node: node, position: at_position)
+      (self.child_ids ||= []) << expression.id
+      expression
+    end
+
+    def create_child_expression(node:, position:)
+      klass = Router.expression_class_for_node(node)
       expression = klass.create(
         :hive => hive,
         :parent_id => id,
-        :position => at_position,
+        :position => position,
         :workitem => workitem,
         :process_id => process_id
-      ).save
-      (self.child_ids ||= []) << expression.id
-      expression
+      )
     end
   end
 end

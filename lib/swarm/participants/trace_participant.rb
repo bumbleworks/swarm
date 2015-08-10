@@ -1,12 +1,13 @@
+require_relative "../participant"
+
 module Swarm
-  class TraceExpression < Expression
+  class TraceParticipant < Participant
     def work
       traced = workitem["traced"] || []
       traced += [arguments.keys.first]
-      self.workitem = workitem.merge("traced" => traced)
+      expression.workitem = workitem.merge("traced" => traced)
       hive.trace(arguments.keys.first)
-      save
-      reply
+      expression.reply
     end
   end
 end

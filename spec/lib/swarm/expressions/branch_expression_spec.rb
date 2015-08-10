@@ -42,27 +42,38 @@ RSpec.describe Swarm::BranchExpression do
     end
   end
 
+  describe "create_child_expression" do
+    it "creates new child expression from given node at given position" do
+      allow(Swarm::Router).to receive(:expression_class_for_node).
+        with(:a_node).
+        and_return(Swarm::ActivityExpression)
+      allow(Swarm::ActivityExpression).to receive(:create).with({
+        :hive => hive,
+        :parent_id => "foo",
+        :position => 7,
+        :workitem => { "foo" => "bar" },
+        :process_id => "123"
+      }).and_return(:the_expression)
+      expect(subject.create_child_expression(:node => :a_node, :position => 7)).
+        to eq(:the_expression)
+    end
+  end
+
   describe "add_child" do
     before(:each) do
       allow(subject).to receive(:tree).and_return([
-        ["not_this_one", {}, []],
-        ["trace", {}, []]
+        ["whatever", {}, []],
+        ["another_one", {}, []]
       ])
     end
 
     it "creates new expression with given command and adds it to child_ids" do
       subject.child_ids = ["876"]
       fake_expression = double(:id => "987")
-      allow(Swarm::TraceExpression).to receive(:create).with({
-        :hive => hive,
-        :parent_id => "foo",
-        :position => 1,
-        :workitem => { "foo" => "bar" },
-        :process_id => "123"
-      }).and_return(fake_expression)
-      expect(fake_expression).to receive(:save).
+      allow(subject).to receive(:create_child_expression).
+        with(:node => ["whatever", {}, []], :position => 0).
         and_return(fake_expression)
-      subject.add_child(1)
+      subject.add_child(0)
       expect(subject.child_ids).to eq(["876", "987"])
     end
 
@@ -70,12 +81,6 @@ RSpec.describe Swarm::BranchExpression do
       expect {
         subject.add_child(2)
       }.to raise_error(described_class::InvalidPositionError)
-    end
-
-    it "raises exception if command nonexistent" do
-      expect {
-        subject.add_child(0)
-      }.to raise_error(NameError)
     end
   end
 end

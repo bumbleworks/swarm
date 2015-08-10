@@ -1,0 +1,6 @@
+["sequence", {}, [
+  ["concurrence", {}, [
+    ["defer", {"horse": null}, []],
+    ["defer", {"horse": null}, []]
+  ]]
+]]
