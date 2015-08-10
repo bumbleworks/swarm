@@ -56,6 +56,12 @@ module Swarm
         end
         constant
       end
+
+      def wait_until(timeout: 5)
+        Timeout::timeout(timeout) do
+          sleep 0.05 until yield
+        end
+      end
     end
   end
 end

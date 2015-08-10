@@ -6,9 +6,7 @@ module Swarm
     many_to_one :process_definition, :class_name => "Swarm::ProcessDefinition"
 
     def wait_until_finished(timeout: 5)
-      Timeout::timeout(timeout) do
-        sleep 0.05 until finished?
-      end
+      Swarm::Support.wait_until(timeout: timeout) { finished? }
     end
 
     def launch
