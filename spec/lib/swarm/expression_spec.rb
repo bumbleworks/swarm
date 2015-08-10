@@ -114,6 +114,16 @@ RSpec.describe Swarm::Expression do
   end
 
   describe "#finished?" do
+    before(:each) do
+      allow(subject).to receive(:reload!)
+    end
+
+    it "calls reload! before checking finished_at" do
+      expect(subject).to receive(:reload!).ordered
+      expect(subject).to receive(:finished_at).ordered
+      subject.finished?
+    end
+
     it "returns true if finished_at not nil" do
       subject.milestones = { "finished_at" => 123456789 }
       expect(subject.finished?).to eq(true)

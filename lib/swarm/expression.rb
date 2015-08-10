@@ -63,6 +63,7 @@ module Swarm
     end
 
     def finished?
+      reload!
       !!finished_at
     end
 
