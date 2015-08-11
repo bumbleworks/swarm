@@ -3,7 +3,8 @@ RSpec.describe Swarm::StorageParticipant do
     Swarm::ActivityExpression.new_from_storage({
       :hive => hive,
       :workitem => { :bubbles => :shiny },
-      :process_id => "bonkers"
+      :process_id => "bonkers",
+      :id => "crazy-id"
     })
   }
   subject {
@@ -21,9 +22,7 @@ RSpec.describe Swarm::StorageParticipant do
     it "creates a StoredWorkitem for expression" do
       expect(Swarm::StoredWorkitem).to receive(:create).with({
         :hive => hive,
-        :expression_id => expression.id,
-        :process_id => "bonkers",
-        :workitem => { :bubbles => :shiny }
+        :expression_id => "crazy-id"
       })
       subject.work
     end

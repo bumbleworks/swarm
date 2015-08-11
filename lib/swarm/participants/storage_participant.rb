@@ -5,9 +5,7 @@ module Swarm
     def work
       StoredWorkitem.create({
         :hive => hive,
-        :process_id => expression.process_id,
-        :expression_id => expression.id,
-        :workitem => workitem
+        :expression_id => expression.id
       })
     end
   end
