@@ -77,12 +77,22 @@ module Swarm
       self.class.columns.each do |column|
         instance_variable_set(:"@#{column}", hsh[column.to_s])
       end
+      self.class.associations.each do |type|
+        instance_variable_set(:"@#{type}", nil)
+      end
       @changed_attributes = {}
       self
     end
 
     class << self
       attr_reader :columns
+      attr_reader :associations
+
+      def inherited(subclass)
+        super
+        subclass.instance_variable_set(:@columns, [])
+        subclass.instance_variable_set(:@associations, [])
+      end
 
       def set_columns(*args)
         attr_reader *args
@@ -91,14 +101,19 @@ module Swarm
             change_attribute(arg, value)
           }
         end
-        @columns = (@columns || []) | args
+        @columns = @columns | args
       end
 
       def many_to_one(type, class_name: nil)
         klass = Swarm::Support.constantize("#{class_name || type}")
         define_method(type) do
-          klass.fetch(self.send(:"#{type}_id"), :hive => hive)
+          memo = instance_variable_get(:"@#{type}")
+          memo || instance_variable_set(
+                    :"@#{type}",
+                    klass.fetch(self.send(:"#{type}_id"), :hive => hive)
+                  )
         end
+        @associations << type
       end
 
       def create(*args)

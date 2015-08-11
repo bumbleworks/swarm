@@ -121,6 +121,25 @@ RSpec.describe Swarm::HiveDweller do
       subject.reload!
       expect(subject).not_to be_changed
     end
+
+    it "clears associations" do
+      association_class = double
+      allow(association_class).to receive(:fetch).
+        with("12345", :hive => hive).and_return(:the_object)
+      allow(association_class).to receive(:fetch).
+        with("67890", :hive => hive).and_return(:the_other_object)
+      allow(Swarm::Support).to receive(:constantize).
+        with("puppy").and_return(association_class)
+
+      test_class.set_columns :puppy_id
+      test_class.many_to_one :puppy
+
+      hive.storage["AluminumHead:1234"] = subject.to_hash.merge(:puppy_id => "67890")
+      subject.puppy_id = "12345"
+      expect(subject.puppy).to eq(:the_object)
+      subject.reload!
+      expect(subject.puppy).to eq(:the_other_object)
+    end
   end
 
   describe ".new" do
@@ -189,25 +208,34 @@ RSpec.describe Swarm::HiveDweller do
   end
 
   describe ".many_to_one" do
-    it "adds helper method to retrieve association" do
-      association_class = double
-      allow(Swarm::Support).to receive(:constantize).
-        with("spam_noodle").and_return(association_class)
+    let(:association_class) { double }
+
+    before(:each) do
       allow(subject).to receive(:spam_noodle_id).and_return("spam_noodle_id")
       allow(association_class).to receive(:fetch).
         with("spam_noodle_id", :hive => hive).and_return(:the_object)
+    end
+
+    it "adds helper method to retrieve association" do
+      allow(Swarm::Support).to receive(:constantize).
+        with("spam_noodle").and_return(association_class)
       test_class.many_to_one :spam_noodle
       expect(subject.spam_noodle).to eq(:the_object)
     end
 
     it "allows for override of class_name" do
-      association_class = double
       allow(Swarm::Support).to receive(:constantize).
         with("MyUnclesTruck").and_return(association_class)
-      allow(subject).to receive(:spam_noodle_id).and_return("spam_noodle_id")
-      allow(association_class).to receive(:fetch).
-        with("spam_noodle_id", :hive => hive).and_return(:the_object)
       test_class.many_to_one :spam_noodle, :class_name => "MyUnclesTruck"
+      expect(subject.spam_noodle).to eq(:the_object)
+    end
+
+    it "memoizes association" do
+      allow(Swarm::Support).to receive(:constantize).
+        with("spam_noodle").and_return(association_class)
+      test_class.many_to_one :spam_noodle
+      expect(subject.spam_noodle).to eq(:the_object)
+      allow(subject).to receive(:spam_noodle_id).and_return("not_spam_noodle_id")
       expect(subject.spam_noodle).to eq(:the_object)
     end
   end
