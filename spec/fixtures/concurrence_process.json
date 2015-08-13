@@ -2,5 +2,6 @@
   ["concurrence", {}, [
     ["defer", {"horse": null}, []],
     ["defer", {"horse": null}, []]
-  ]]
+  ]],
+  ["trace", { "concurrence done": null }, []]
 ]]

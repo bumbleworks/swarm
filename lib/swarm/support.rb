@@ -57,7 +57,8 @@ module Swarm
         constant
       end
 
-      def wait_until(timeout: 5)
+      def wait_until(timeout: 5, initial_delay: nil)
+        sleep(initial_delay) if initial_delay.is_a?(Numeric)
         Timeout::timeout(timeout) do
           sleep 0.05 until yield
         end

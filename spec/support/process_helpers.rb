@@ -11,7 +11,13 @@ module ProcessHelpers
     @hive ||= Swarm::Hive.new(:storage => storage, :work_queue => work_queue)
   end
 
-  def wait_until(timeout: 5)
-    Swarm::Support.wait_until(timeout: timeout, &Proc.new)
+  def wait_until(*args)
+    Swarm::Support.wait_until(*args, &Proc.new)
+  end
+
+  def wait_until_worker_idle
+    wait_until(initial_delay: 0.1) {
+      work_queue.tube.peek(:ready).nil? && @worker_thread.stop?
+    }
   end
 end

@@ -11,8 +11,8 @@ module Swarm
       end
 
       def run!
-        @working = true
-        while working?
+        @running = true
+        while running?
           process_next_job
         end
       end
@@ -20,6 +20,7 @@ module Swarm
       def process_next_job
         begin
           @current_job = queue.reserve_job
+          @working = true
           work_on(@current_job)
           queue.delete_job(@current_job) if @current_job
         rescue WorkQueue::JobReservationFailed
@@ -28,6 +29,7 @@ module Swarm
           queue.bury_job(@current_job) if @current_job
         ensure
           queue.clean_up_job(@current_job) if @current_job
+          @working = false
           @current_job = nil
         end
       end
@@ -36,8 +38,12 @@ module Swarm
         @working == true
       end
 
+      def running?
+        @running == true
+      end
+
       def stop!
-        @working = false
+        @running = false
         @current_job = nil
       end
 

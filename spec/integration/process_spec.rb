@@ -26,5 +26,21 @@ RSpec.describe Swarm::Process, :type => :process do
       wait_until { Swarm::StoredWorkitem.all(hive: hive).count == 2 }
       expect(Swarm::StoredWorkitem.all(hive: hive).map(&:command)).to eq(["defer", "defer"])
     end
+
+    it "does not proceed if not all children have replied" do
+      subject
+      wait_until { Swarm::StoredWorkitem.all(hive: hive).count == 2 }
+      Swarm::StoredWorkitem.all(hive: hive).first.proceed
+      wait_until_worker_idle
+      expect(hive.traced).to be_empty
+    end
+
+    it "proceeds when all children have replied" do
+      subject
+      wait_until { Swarm::StoredWorkitem.all(hive: hive).count == 2 }
+      Swarm::StoredWorkitem.all(hive: hive).map(&:proceed)
+      wait_until_worker_idle
+      expect(hive.traced).to eq(["concurrence done"])
+    end
   end
 end

@@ -21,10 +21,26 @@ RSpec.describe Swarm::Engine::Worker do
     end
   end
 
+  describe "#running?" do
+    it "returns true if running variable true" do
+      subject.instance_variable_set(:@running, true)
+      expect(subject).to be_running
+    end
+
+    it "returns false if running variable false" do
+      subject.instance_variable_set(:@running, false)
+      expect(subject).not_to be_running
+    end
+
+    it "returns false by default" do
+      expect(subject).not_to be_running
+    end
+  end
+
   describe "#run!" do
-    it "processes jobs while working" do
+    it "processes jobs while running" do
       expect(subject).to receive(:process_next_job).twice
-      expect(subject).to receive(:working?).and_return(true, true, false)
+      expect(subject).to receive(:running?).and_return(true, true, false)
       subject.run!
     end
   end
@@ -88,11 +104,11 @@ RSpec.describe Swarm::Engine::Worker do
   end
 
   describe "#stop!" do
-    it "sets working to false and clears current job" do
-      subject.instance_variable_set(:@working, true)
+    it "sets running to false and clears current job" do
+      subject.instance_variable_set(:@running, true)
       subject.instance_variable_set(:@current_job, :a_job)
       subject.stop!
-      expect(subject).not_to be_working
+      expect(subject).not_to be_running
       expect(subject.instance_variable_get(:@current_job)).to be_nil
     end
   end
