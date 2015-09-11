@@ -29,10 +29,34 @@ RSpec.describe Swarm::Engine::Worker::Job do
       subject.run_command!
     end
 
+    it "calls observer callbacks before and after" do
+      foo_observer, bar_observer = double, double
+      hive_dweller = double
+      allow(subject).to receive(:object).and_return(hive_dweller)
+      allow(subject).to receive(:observers).and_return([foo_observer, bar_observer])
+      expect(foo_observer).to receive(:before_command).ordered
+      expect(bar_observer).to receive(:before_command).ordered
+      expect(hive_dweller).to receive(:_fight).ordered
+      expect(foo_observer).to receive(:after_command).ordered
+      expect(bar_observer).to receive(:after_command).ordered
+      subject.run_command!
+    end
+
     it "raises an exception if no object" do
       expect {
         subject.run_command!
       }.to raise_error(described_class::MissingObjectError)
+    end
+  end
+
+  describe "#observers" do
+    it "returns instances of each registered observer" do
+      foo = double("FooObserver")
+      bar = double("BarObserver")
+      allow(foo).to receive(:new).with(subject).and_return(:foo_instance)
+      allow(bar).to receive(:new).with(subject).and_return(:bar_instance)
+      allow(hive).to receive(:registered_observers).and_return([foo, bar])
+      expect(subject.observers).to eq([:foo_instance, :bar_instance])
     end
   end
 

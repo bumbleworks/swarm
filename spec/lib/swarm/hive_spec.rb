@@ -77,4 +77,16 @@ RSpec.describe Swarm::Hive do
       expect(storage["trace"]).to eq(["hot dogs"])
     end
   end
+
+  describe "#registered_observers" do
+    it "defaults to empty array" do
+      expect(subject.registered_observers).to eq([])
+    end
+
+    it "can be appended to" do
+      subject.registered_observers << "hats"
+      subject.registered_observers << "bumpers"
+      expect(subject.registered_observers).to eq(["hats", "bumpers"])
+    end
+  end
 end

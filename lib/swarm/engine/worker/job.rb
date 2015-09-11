@@ -22,7 +22,15 @@ module Swarm
 
         def run_command!
           raise MissingObjectError if object.nil?
+          observers.each(&:before_command)
           object.send("_#{command}")
+          observers.each(&:after_command)
+        end
+
+        def observers
+          @observers ||= hive.registered_observers.map { |observer_class|
+            observer_class.new(self)
+          }
         end
 
         def object
