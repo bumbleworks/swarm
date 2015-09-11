@@ -1,8 +1,12 @@
 RSpec.describe Swarm::Engine::Worker do
   subject { described_class.new(hive: hive) }
+  let(:worker_job) { described_class::Job.new(command: "spew", metadata: {}, hive: hive) }
 
   before(:each) {
     allow(work_queue).to receive(:clone).and_return(work_queue)
+    allow(described_class::Job).to receive(:from_queued_job).
+      with(:a_queued_job, hive: hive).
+      and_return(worker_job)
   }
 
   describe "#working?" do
@@ -45,27 +49,17 @@ RSpec.describe Swarm::Engine::Worker do
     end
   end
 
-  describe "#run_command!" do
-    it "fetches object from metadata and sends given command" do
-      hive_dweller = double
-      allow(hive).to receive(:fetch).with("SpecialHat", "9876").and_return(hive_dweller)
-      expect(hive_dweller).to receive(:_grapple)
-      subject.run_command!("grapple", { "type" => "SpecialHat", "id" => "9876" })
-    end
-  end
-
   describe "#work_on" do
     it "pulls command and metadata from JSON job body and runs the command" do
-      job = double(:body => { "command" => "grapple", "metadata" => "the_metadata" }.to_json)
-      expect(subject).to receive(:run_command!).with("grapple", "the_metadata")
-      subject.work_on(job)
+      expect(worker_job).to receive(:run_command!)
+      subject.work_on(:a_queued_job)
     end
 
     it "stops worker and cleans up if job contains special 'stop_worker' command" do
-      job = double(:body => { "command" => "stop_worker" }.to_json)
-      expect(work_queue).to receive(:remove_worker).with(subject, :stop_job => job).ordered
+      allow(worker_job).to receive(:stop_job?).and_return(true)
+      expect(work_queue).to receive(:remove_worker).with(subject, :stop_job => :a_queued_job).ordered
       expect(subject).to receive(:stop!).ordered
-      subject.work_on(job)
+      subject.work_on(:a_queued_job)
     end
   end
 

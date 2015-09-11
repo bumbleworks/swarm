@@ -1,4 +1,5 @@
 require "beaneater"
+require_relative "worker/job"
 
 module Swarm
   module Engine
@@ -47,20 +48,14 @@ module Swarm
         @current_job = nil
       end
 
-      def work_on(job)
-        data = JSON.parse(job.body)
-        command, metadata = data.values_at("command", "metadata")
-        if command == "stop_worker"
-          queue.remove_worker(self, :stop_job => job)
+      def work_on(queue_job)
+        worker_job = Job.from_queued_job(queue_job, hive: hive)
+        if worker_job.stop_job?
+          queue.remove_worker(self, :stop_job => queue_job)
           stop!
         else
-          run_command!(command, metadata)
+          worker_job.run_command!
         end
-      end
-
-      def run_command!(command, metadata)
-        object = hive.fetch(metadata["type"], metadata["id"])
-        object.send("_#{command}")
       end
     end
   end
