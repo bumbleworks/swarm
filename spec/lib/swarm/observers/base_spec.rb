@@ -1,3 +1,5 @@
+require "swarm/observers/base"
+
 RSpec.describe Swarm::Observers::Base do
   let(:worker_job) { Swarm::Engine::Worker::Job.new(hive: hive, command: "brog", metadata: "foober") }
   subject { described_class.new(worker_job) }
