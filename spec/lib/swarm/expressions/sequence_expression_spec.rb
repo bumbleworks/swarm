@@ -1,7 +1,6 @@
 RSpec.describe Swarm::SequenceExpression do
   subject {
     described_class.new_from_storage({
-      :hive => hive,
       :id => 'foo',
       :workitem => { 'foo' => 'bar' },
       :process_id => '123',

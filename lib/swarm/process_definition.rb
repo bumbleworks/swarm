@@ -7,7 +7,7 @@ module Swarm
     set_columns :tree
 
     class << self
-      def create_from_json(json, hive:)
+      def create_from_json(json, hive: Hive.default)
         create(:hive => hive, :tree => JSON.parse(json))
       end
     end

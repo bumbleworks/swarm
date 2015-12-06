@@ -1,14 +1,14 @@
 module ProcessHelpers
   def storage
-    @storage ||= Swarm::Storage.new({})
+    @storage ||= hive.storage
   end
 
   def work_queue
-    @work_queue ||= Swarm::Engine::WorkQueue.new(:name => "swarm-test-queue", :address => "localhost:11300")
+    @work_queue ||= hive.work_queue
   end
 
   def hive
-    @hive ||= Swarm::Hive.new(:storage => storage, :work_queue => work_queue)
+    @hive ||= Swarm::Hive.default
   end
 
   def wait_until(*args)

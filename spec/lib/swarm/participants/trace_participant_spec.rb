@@ -1,13 +1,11 @@
 RSpec.describe Swarm::TraceParticipant do
   let(:expression) {
     Swarm::ActivityExpression.new_from_storage({
-      :hive => hive,
       :workitem => {},
     })
   }
   subject {
     described_class.new({
-      :hive => hive,
       :expression => expression
     })
   }

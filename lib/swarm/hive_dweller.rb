@@ -2,7 +2,7 @@ module Swarm
   class HiveDweller
     attr_reader :hive, :id
 
-    def initialize(hive:, **args)
+    def initialize(hive: Hive.default, **args)
       @hive = hive
       @changed_attributes = {}
       set_attributes(args, record_changes: false)
@@ -85,8 +85,9 @@ module Swarm
     end
 
     class << self
-      attr_reader :columns
-      attr_reader :associations
+      include Enumerable
+
+      attr_reader :columns, :associations
 
       def inherited(subclass)
         super
@@ -116,8 +117,8 @@ module Swarm
         @associations << type
       end
 
-      def create(*args)
-        new(*args).save
+      def create(hive: Hive.default, **args)
+        new(hive: hive, **args).save
       end
 
       def storage_type
@@ -139,25 +140,27 @@ module Swarm
         }
       end
 
-      def fetch(key, hive:)
+      def fetch(key, hive: Hive.default)
         hsh = hive.storage[storage_id_for_key(key)].dup
         hive.reify_from_hash(hsh)
       end
 
-      def ids(hive:)
+      def ids(hive: Hive.default)
         hive.storage.ids_for_type(storage_type)
       end
 
-      def all(hive:, subtypes: true)
-        ids(hive: hive).map { |id|
-          fetch(id, hive: hive)
-        }.select { |object|
-          if subtypes
-            object.is_a?(self)
-          else
-            object.class == self
+      def each(hive: Hive.default, subtypes: true, &block)
+        return to_enum(__method__, hive: hive, subtypes: subtypes) unless block_given?
+        ids(hive: hive).each do |id|
+          object = fetch(id, hive: hive)
+          if (subtypes && object.is_a?(self)) || object.class == self
+            yield object
           end
-        }
+        end
+      end
+
+      def all(hive: Hive.default, subtypes: true)
+        to_a(hive: hive, subtypes: subtypes)
       end
     end
   end

@@ -6,7 +6,7 @@ module Swarm
     class Worker
       attr_reader :hive, :queue
 
-      def initialize(hive:)
+      def initialize(hive: Hive.default)
         @hive = hive
         @queue = hive.work_queue.clone
       end

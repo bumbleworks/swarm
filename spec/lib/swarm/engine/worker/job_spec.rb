@@ -1,7 +1,7 @@
 RSpec.describe Swarm::Engine::Worker::Job do
   let(:metadata) { { "foo" => "bar" } }
   let(:job_arguments) { { command: "fight", metadata: metadata } }
-  subject { described_class.new(hive: hive, **job_arguments) }
+  subject { described_class.new(**job_arguments) }
 
   describe ".from_queued_job" do
     it "parses command and metadata from queued job and instantiates Worker::Job" do

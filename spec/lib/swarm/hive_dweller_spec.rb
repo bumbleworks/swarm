@@ -172,9 +172,9 @@ RSpec.describe Swarm::HiveDweller do
   describe ".create" do
     it "instantiates a new object and immediately saves it" do
       new_object = double
-      allow(test_class).to receive(:new).with(:the_args).and_return(new_object)
+      allow(test_class).to receive(:new).with(hive: hive, args: :the_args).and_return(new_object)
       expect(new_object).to receive(:save)
-      test_class.create(:the_args)
+      test_class.create(args: :the_args)
     end
   end
 

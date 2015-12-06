@@ -52,6 +52,19 @@ RSpec.describe Swarm::Storage do
     end
   end
 
+  describe "#truncate" do
+    it "clears backend" do
+      subject.truncate
+      expect(subject.backend).to be_empty
+    end
+
+    it "works with Redis" do
+      # this expectation also makes "respond_to?" return true
+      expect(backend).to receive(:flushdb)
+      subject.truncate
+    end
+  end
+
   describe "#delete" do
     it "deletes key from backend" do
       subject.delete("foo:2")

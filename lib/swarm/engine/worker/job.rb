@@ -5,7 +5,7 @@ module Swarm
         class MissingObjectError < StandardError; end
 
         class << self
-          def from_queued_job(work_queue_job, hive:)
+          def from_queued_job(work_queue_job, hive: Hive.default)
             data = JSON.parse(work_queue_job.body)
             command, metadata = data.values_at("command", "metadata")
             new(command: command, metadata: metadata, hive: hive)
@@ -14,7 +14,7 @@ module Swarm
 
         attr_reader :command, :metadata, :hive
 
-        def initialize(hive:, command:, metadata:)
+        def initialize(hive: Hive.default, command:, metadata:)
           @hive = hive
           @command = command
           @metadata = metadata

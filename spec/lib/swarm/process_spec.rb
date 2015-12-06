@@ -1,5 +1,5 @@
 RSpec.describe Swarm::Process do
-  let(:params) { { :hive => hive, :process_definition_id => '123', :workitem => "the workitem"} }
+  let(:params) { { :process_definition_id => '123', :workitem => "the workitem"} }
   subject { described_class.create(params) }
 
   describe "#wait_until_finished" do
@@ -19,7 +19,7 @@ RSpec.describe Swarm::Process do
   describe "#process_definition" do
     it "returns process definition for this process" do
       allow(Swarm::ProcessDefinition).to receive(:fetch).
-        with('123', :hive => hive).
+        with('123', hive: hive).
         and_return(:the_definition)
       expect(subject.process_definition).to eq(:the_definition)
     end
@@ -72,7 +72,7 @@ RSpec.describe Swarm::Process do
   end
 
   describe "#finished?" do
-    let(:root_expression) { Swarm::Expression.create(:hive => hive) }
+    let(:root_expression) { Swarm::Expression.create }
     it "returns true if root expression is finished" do
       allow(root_expression).to receive(:finished?).and_return(true)
       allow(subject).to receive(:root_expression).
@@ -97,7 +97,7 @@ RSpec.describe Swarm::Process do
   describe "#root_expression" do
     before(:each) do
       allow(Swarm::Expression).to receive(:fetch).
-        with('456', :hive => hive).
+        with('456', hive: hive).
         and_return(:the_expression)
     end
 

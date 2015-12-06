@@ -2,7 +2,7 @@ module Swarm
   class Participant
     attr_reader :hive, :expression
 
-    def initialize(hive:, expression:)
+    def initialize(hive: Hive.default, expression:)
       @hive = hive
       @expression = expression
     end

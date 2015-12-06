@@ -1,7 +1,6 @@
 RSpec.describe Swarm::StorageParticipant do
   let(:expression) {
     Swarm::ActivityExpression.new_from_storage({
-      :hive => hive,
       :workitem => { :bubbles => :shiny },
       :process_id => "bonkers",
       :id => "crazy-id"
@@ -9,7 +8,6 @@ RSpec.describe Swarm::StorageParticipant do
   }
   subject {
     described_class.new({
-      :hive => hive,
       :expression => expression
     })
   }

@@ -1,6 +1,37 @@
 RSpec.describe Swarm::Hive do
   subject { hive }
 
+  context "preserving default Hive" do
+    around(:each) do |test|
+      existing_default = described_class.default
+      test.run
+      described_class.default = existing_default
+    end
+
+    describe ".default=" do
+      it "stores a default Hive instance" do
+        dummy_hive = Swarm::Hive.new(storage: nil, work_queue: nil)
+        described_class.default = dummy_hive
+        expect(described_class.default).to eq(dummy_hive)
+      end
+
+      it "raises an exception if attempting to set non-hive default" do
+        expect {
+          described_class.default = "not a Hive"
+        }.to raise_error(described_class::IllegalDefaultError)
+      end
+    end
+
+    describe ".default" do
+      it "raises an exception if no default set" do
+        described_class.instance_variable_set(:"@default", nil)
+        expect {
+          described_class.default
+        }.to raise_error(described_class::NoDefaultSetError)
+      end
+    end
+  end
+
   describe "#fetch" do
     it "constantizes given type and delegates fetch to class" do
       klass_double = double
@@ -10,7 +41,6 @@ RSpec.describe Swarm::Hive do
       expect(subject.fetch("Heads::AluminumHead", "1234")).to eq(:the_item)
     end
   end
-
 
   describe "#inspect" do
     it "reveals storage class and work queue name" do

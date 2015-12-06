@@ -1,5 +1,5 @@
 RSpec.describe Swarm::Engine::Worker do
-  subject { described_class.new(hive: hive) }
+  subject { described_class.new }
   let(:worker_job) { described_class::Job.new(command: "spew", metadata: {}, hive: hive) }
 
   before(:each) {

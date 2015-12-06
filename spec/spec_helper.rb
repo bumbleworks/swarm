@@ -20,9 +20,22 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 
+  config.before(:suite) do
+    Swarm::Hive.default = Swarm::Hive.new(
+      :storage => Swarm::Storage.new({}),
+      :work_queue => Swarm::Engine::WorkQueue.new(:name => "swarm-test-queue", :address => "localhost:11300")
+    )
+  end
+
+  config.before(:each) do
+    storage["trace"] = nil
+    hive.registered_observers.clear
+  end
+
   config.around(:each, :type => :process) do |example|
     hive.work_queue.clear
-    worker = Swarm::Engine::Worker.new(:hive => hive)
+    hive.storage.truncate
+    worker = Swarm::Engine::Worker.new
     @worker_thread = Thread.new {
       worker.run!
     }

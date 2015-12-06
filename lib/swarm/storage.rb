@@ -44,5 +44,13 @@ module Swarm
         backend.delete(key)
       end
     end
+
+    def truncate
+      if backend.respond_to?(:flushdb)
+        backend.flushdb
+      else
+        backend.clear
+      end
+    end
   end
 end

@@ -3,6 +3,24 @@ require_relative "storage"
 module Swarm
   class Hive
     class MissingTypeError < StandardError; end
+    class IllegalDefaultError < StandardError; end
+    class NoDefaultSetError < StandardError; end
+
+    class << self
+      def default=(default)
+        unless default.is_a?(self)
+          raise IllegalDefaultError.new("Default must be a Swarm::Hive")
+        end
+        @default = default
+      end
+
+      def default
+        unless @default
+          raise NoDefaultSetError.new("No default Hive defined yet")
+        end
+        @default
+      end
+    end
 
     attr_reader :storage, :work_queue
 
