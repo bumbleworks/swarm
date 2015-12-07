@@ -1,7 +1,7 @@
 ["sequence", {}, [
   ["concurrence", {}, [
-    ["defer", {"horse": null}, []],
-    ["defer", {"horse": null}, []]
+    ["defer", {}, []],
+    ["defer", {}, []]
   ]],
-  ["trace", { "concurrence done": null }, []]
+  ["trace", { "text": "concurrence done" }, []]
 ]]

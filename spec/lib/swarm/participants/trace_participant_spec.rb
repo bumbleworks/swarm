@@ -11,7 +11,7 @@ RSpec.describe Swarm::TraceParticipant do
   }
 
   before(:each) do
-    allow(expression).to receive(:node).and_return(["trace", {"some words" => nil}, []])
+    allow(expression).to receive(:node).and_return(["trace", {"text" => "some words"}, []])
   end
 
   describe "#work" do

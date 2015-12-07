@@ -1,9 +1,9 @@
 ["sequence", {}, [
-  ["trace", { "first string": null }, []],
-  ["trace", { "second string": null }, []],
+  ["trace", { "text": "first string" }, []],
+  ["trace", { "text": "second string" }, []],
   ["sequence", {}, [
-    ["trace", { "third string": null }, []],
-    ["trace", { "fourth string": null }, []]
+    ["trace", { "text": "third string" }, []],
+    ["trace", { "text": "fourth string" }, []]
   ]],
-  ["trace", { "final string": null }, []]
+  ["trace", { "text": "final string" }, []]
 ]]
