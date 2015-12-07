@@ -33,6 +33,17 @@ RSpec.describe Swarm::Support do
     end
   end
 
+  describe ".symbolize_keys" do
+    it "returns copy of given hash with symbolized keys" do
+      hsh = { :fancy => { "blue" => "green"}, "what" => 42 }
+      new_hsh = described_class.symbolize_keys(hsh)
+      expect(new_hsh).to eq({
+        :fancy => { "blue" => "green"}, :what => 42
+      })
+      expect(new_hsh).not_to eq(hsh)
+    end
+  end
+
   describe ".symbolize_keys!" do
     it "symbolizes keys in given hash" do
       hsh = { :fancy => { "blue" => "green"}, "what" => 42 }

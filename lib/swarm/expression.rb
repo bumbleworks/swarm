@@ -1,3 +1,5 @@
+require_relative "evaluation/expression_evaluator"
+
 module Swarm
   class Expression < HiveDweller
     class << self
@@ -13,6 +15,14 @@ module Swarm
 
     set_columns :parent_id, :position, :workitem, :child_ids, :milestones, :process_id
     many_to_one :process, :class_name => "Swarm::Process"
+
+    def evaluator
+      @evaluator ||= Swarm::ExpressionEvaluator.new(self)
+    end
+
+    def meets_conditions?
+      evaluator.all_conditions_met?
+    end
 
     def root?
       process_id == parent_id
@@ -37,7 +47,7 @@ module Swarm
 
     def _apply
       set_milestone("applied_at")
-      work
+      meets_conditions? ? work : reply
       save
     end
 

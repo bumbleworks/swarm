@@ -4,6 +4,8 @@ module Swarm
       def expression_class_for_node(node)
         command = node[0]
         expression_type = case command
+        when "if", "unless"
+          "conditional"
         when "sequence", "concurrence"
           command
         else

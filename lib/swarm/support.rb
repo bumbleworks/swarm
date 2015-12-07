@@ -19,6 +19,11 @@ module Swarm
         hsh.keys.each do |key|
           hsh[key.to_sym] = hsh.delete(key)
         end
+        hsh
+      end
+
+      def symbolize_keys(hsh)
+        symbolize_keys!(hsh.dup)
       end
 
       def combine_arrays(v1, v2, method: :concat)
@@ -55,6 +60,14 @@ module Swarm
           constant = constant_defined ? constant.const_get(name_part) : constant.const_missing(name_part)
         end
         constant
+      end
+
+      def slice(hash, *keys)
+        {}.tap { |h|
+          keys.each { |k|
+            h[k] = hash[k] if hash.has_key?(k)
+          }
+        }
       end
 
       def wait_until(timeout: 5, initial_delay: nil)

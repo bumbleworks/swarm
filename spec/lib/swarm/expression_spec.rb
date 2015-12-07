@@ -10,6 +10,23 @@ RSpec.describe Swarm::Expression do
     end
   end
 
+  describe "#evaluator" do
+    it "returns an ExpressionEvaluator for the expression" do
+      evaluator = double(Swarm::ExpressionEvaluator)
+      allow(Swarm::ExpressionEvaluator).to receive(:new).
+        with(subject).
+        and_return(evaluator)
+      expect(subject.evaluator).to eq(evaluator)
+    end
+  end
+
+  describe "#meets_conditions?" do
+    it "asks evaluator if all_conditions_met?" do
+      allow(subject.evaluator).to receive(:all_conditions_met?).and_return(:answer)
+      expect(subject.meets_conditions?).to eq(:answer)
+    end
+  end
+
   describe "#root?" do
     it "returns true if parent is same as process" do
       subject.parent_id = '123'
@@ -51,7 +68,18 @@ RSpec.describe Swarm::Expression do
     end
 
     it "sets applied_at milestone, calls #work, and saves" do
+      allow(subject).to receive(:meets_conditions?).and_return(true)
       expect(subject).to receive(:work).ordered
+      expect(subject).to receive(:reply).never
+      expect(subject).to receive(:save).ordered
+      subject._apply
+      expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
+    end
+
+    it "calls #reply instead of #work if conditions not met" do
+      allow(subject).to receive(:meets_conditions?).and_return(false)
+      expect(subject).to receive(:work).never
+      expect(subject).to receive(:reply).ordered
       expect(subject).to receive(:save).ordered
       subject._apply
       expect(subject.milestones["applied_at"]).to eq(Time.now.to_i)
