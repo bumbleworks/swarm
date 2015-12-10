@@ -1,0 +1,37 @@
+name: conditional_process
+title: "Conditional Process"
+description: "Process to test conditional arguments and blocks"
+version: 1.0
+--
+sequence do
+  sequence "if" => "ghosts == 'real'" do
+    trace "ghosts are real!"
+  end
+  if "ghosts == 'real'"
+    trace "for reals they are"
+  else
+    trace "oh"
+    trace "ha ha"
+    trace if: "ghosts == 'real'", text: "wait maybe they are"
+  end
+  sequence if: "ghosts != 'real'", foo: "bar"  do
+    trace "no such thing as ghosts"
+  end
+  if "ghosts != 'real'"
+    trace "they don't exist yo"
+  else
+    trace "very scary indeed"
+  end
+  if "ghosts == 'real'"
+    trace "you'll probably get eaten"
+  end
+  unless "ghosts == 'real'"
+    trace "text" => "so you can relax"
+  else
+    trace "so you need a baseball bat"
+  end
+  concurrence unless: "ghosts != 'real'" do
+    trace "hoo boy"
+  end
+  trace "and that is a fact"
+end

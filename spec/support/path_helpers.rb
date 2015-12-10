@@ -8,4 +8,8 @@ module PathHelpers
   def fixtures_path
     spec_path.join('fixtures')
   end
+
+  def fixture_path(fixture)
+    fixtures_path.join(fixture)
+  end
 end

@@ -1,60 +1,67 @@
-["sequence", {}, [
-  ["sequence", { "if": "ghosts == 'real'" }, [
-    ["trace", { "text": "ghosts are real!" }, []]
-  ]],
-  ["if", { "condition": "ghosts == 'real'" }, {
-    "true": [
-      ["sequence", {}, [
-        ["trace", { "text": "for reals they are" }, []]
-      ]]
-    ],
-    "false": [
-      ["sequence", {}, [
-        ["trace", { "text": "oh" }, []],
-        ["trace", { "text": "ha ha" }, []],
-        ["trace", {
-          "if": "ghosts == 'real'",
-          "text": "wait maybe they are"
-        }, []]
-      ]]
-    ]
-  }],
-  ["sequence", { "if": "ghosts != 'real'" }, [
-    ["trace", { "text": "no such thing as ghosts" }, []]
-  ]],
-  ["if", { "condition": "ghosts != 'real'" }, {
-    "true": [
-      ["sequence", {}, [
-        ["trace", { "text": "they don't exist yo" }, []]
-      ]]
-    ],
-    "false": [
-      ["sequence", {}, [
-        ["trace", { "text": "very scary indeed" }, []]
-      ]]
-    ]
-  }],
-  ["if", { "condition": "ghosts == 'real'" }, {
-    "true": [
-      ["sequence", {}, [
-        ["trace", { "text": "you'll probably get eaten" }, []]
-      ]]
-    ]
-  }],
-  ["unless", { "condition": "ghosts == 'real'" }, {
-    "true": [
-      ["sequence", {}, [
-        ["trace", { "text": "so you can relax" }, []]
-      ]]
-    ],
-    "false": [
-      ["sequence", {}, [
-        ["trace", { "text": "so you need a baseball bat" }, []]
-      ]]
-    ]
-  }],
-  ["concurrence", { "unless": "ghosts != 'real'" }, [
-    ["trace", { "text": "hoo boy" }, []]
-  ]],
-  ["trace", { "text": "and that is a fact" }, []]
-]]
+{
+  "name": "conditional_process",
+  "title": "Conditional Process",
+  "description": "Process to test conditional arguments and blocks",
+  "version": 1.0,
+  "definition":
+    ["sequence", {}, [
+      ["sequence", { "if": "ghosts == 'real'" }, [
+        ["trace", { "text": "ghosts are real!" }, []]
+      ]],
+      ["if", { "condition": "ghosts == 'real'" }, {
+        "true": [
+          ["sequence", {}, [
+            ["trace", { "text": "for reals they are" }, []]
+          ]]
+        ],
+        "false": [
+          ["sequence", {}, [
+            ["trace", { "text": "oh" }, []],
+            ["trace", { "text": "ha ha" }, []],
+            ["trace", {
+              "if": "ghosts == 'real'",
+              "text": "wait maybe they are"
+            }, []]
+          ]]
+        ]
+      }],
+      ["sequence", { "if": "ghosts != 'real'", "foo": "bar" }, [
+        ["trace", { "text": "no such thing as ghosts" }, []]
+      ]],
+      ["if", { "condition": "ghosts != 'real'" }, {
+        "true": [
+          ["sequence", {}, [
+            ["trace", { "text": "they don't exist yo" }, []]
+          ]]
+        ],
+        "false": [
+          ["sequence", {}, [
+            ["trace", { "text": "very scary indeed" }, []]
+          ]]
+        ]
+      }],
+      ["if", { "condition": "ghosts == 'real'" }, {
+        "true": [
+          ["sequence", {}, [
+            ["trace", { "text": "you'll probably get eaten" }, []]
+          ]]
+        ]
+      }],
+      ["unless", { "condition": "ghosts == 'real'" }, {
+        "true": [
+          ["sequence", {}, [
+            ["trace", { "text": "so you can relax" }, []]
+          ]]
+        ],
+        "false": [
+          ["sequence", {}, [
+            ["trace", { "text": "so you need a baseball bat" }, []]
+          ]]
+        ]
+      }],
+      ["concurrence", { "unless": "ghosts != 'real'" }, [
+        ["trace", { "text": "hoo boy" }, []]
+      ]],
+      ["trace", { "text": "and that is a fact" }, []]
+    ]]
+}

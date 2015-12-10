@@ -1,0 +1,9 @@
+sequence do
+  trace "first string"
+  trace "second string"
+  sequence do
+    trace "third string"
+    trace "fourth string"
+  end
+  trace "final string"
+end

@@ -14,6 +14,7 @@ require "swarm/expressions/activity_expression"
 require "swarm/stored_workitem"
 require "swarm/participants/trace_participant"
 require "swarm/participants/storage_participant"
+require "swarm/pollen/reader"
 require "redis"
 
 module Swarm

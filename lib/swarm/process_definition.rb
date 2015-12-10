@@ -4,11 +4,29 @@ module Swarm
   class ProcessDefinition < HiveDweller
     class NotYetPersistedError < StandardError; end
 
-    set_columns :tree
+    set_columns :tree, :name, :version
 
     class << self
       def create_from_json(json, hive: Hive.default)
-        create(:hive => hive, :tree => JSON.parse(json))
+        create(**parse_json_definition(json).merge(:hive => hive))
+      end
+
+      def create_from_pollen(pollen, hive: Hive.default)
+        json = Swarm::Pollen::Reader.new(pollen).to_json
+        create_from_json(json, hive: hive)
+      end
+
+      def parse_json_definition(json)
+        parsed = JSON.parse(json)
+        if parsed.is_a?(Array)
+          { :tree => parsed }
+        else
+          {
+            :name => parsed["name"],
+            :version => parsed["version"],
+            :tree => parsed["definition"]
+          }
+        end
       end
     end
 

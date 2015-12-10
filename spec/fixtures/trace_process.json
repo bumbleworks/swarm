@@ -1,9 +1,12 @@
-["sequence", {}, [
-  ["trace", { "text": "first string" }, []],
-  ["trace", { "text": "second string" }, []],
-  ["sequence", {}, [
-    ["trace", { "text": "third string" }, []],
-    ["trace", { "text": "fourth string" }, []]
-  ]],
-  ["trace", { "text": "final string" }, []]
-]]
+{
+  "definition":
+    ["sequence", {}, [
+      ["trace", { "text": "first string" }, []],
+      ["trace", { "text": "second string" }, []],
+      ["sequence", {}, [
+        ["trace", { "text": "third string" }, []],
+        ["trace", { "text": "fourth string" }, []]
+      ]],
+      ["trace", { "text": "final string" }, []]
+    ]]
+}
