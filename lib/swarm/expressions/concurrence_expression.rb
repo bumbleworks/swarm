@@ -6,8 +6,18 @@ module Swarm
       kick_off_children(tree.each_index.to_a)
     end
 
+    def replied_children
+      children.select(&:replied_at)
+    end
+
+    def ready_to_proceed?
+      required_replies = arguments.fetch("required_replies", nil)
+      return all_children_replied? unless required_replies
+      replied_children.count >= required_replies
+    end
+
     def all_children_replied?
-      children.count(&:replied_at) == tree.size
+      replied_children.count == tree.size
     end
 
     def move_on_from(child)
@@ -25,7 +35,7 @@ module Swarm
     end
 
     def array_combination_method
-      arguments["combine_arrays"] || "uniq"
+      arguments.fetch("combine_arrays", "uniq")
     end
   end
 end

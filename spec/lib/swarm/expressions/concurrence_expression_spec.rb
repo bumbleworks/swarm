@@ -1,4 +1,5 @@
 RSpec.describe Swarm::ConcurrenceExpression do
+  let(:node) { ["concurrence", {}, [:a, :b]] }
   subject {
     described_class.new_from_storage({
       :id => 'foo',
@@ -9,7 +10,7 @@ RSpec.describe Swarm::ConcurrenceExpression do
   }
 
   before(:each) do
-    allow(subject).to receive(:node).and_return(["concurrence", {}, [:a, :b]])
+    allow(subject).to receive(:node).and_return(node)
   end
 
   describe "#work" do
@@ -19,27 +20,57 @@ RSpec.describe Swarm::ConcurrenceExpression do
     end
   end
 
-  describe "#all_children_replied?" do
-    it "returns true if all children have replied" do
+  describe "#ready_to_proceed?" do
+    context "with default concurrence" do
+      it "defers to #all_children_replied?" do
+        allow(subject).to receive(:all_children_replied?).
+          and_return(:true_or_false)
+        expect(subject.ready_to_proceed?).to eq(:true_or_false)
+      end
+    end
+
+    context "with required_replies argument" do
+      let(:node) { ["concurrence", { "required_replies" => 3 }, [:a, :b, :c, :d]] }
+
+      it "returns true when replied children count is equal to required replies" do
+        allow(subject).to receive(:replied_children).
+          and_return(Array.new(3, :foo))
+        expect(subject.ready_to_proceed?).to eq(true)
+      end
+
+      it "returns true when replied children count is greater than required replies" do
+        allow(subject).to receive(:replied_children).
+          and_return(Array.new(4, :foo))
+        expect(subject.ready_to_proceed?).to eq(true)
+      end
+
+      it "returns false when replied children count is less than required replies" do
+        allow(subject).to receive(:replied_children).
+          and_return(Array.new(2, :foo))
+        expect(subject.ready_to_proceed?).to eq(false)
+      end
+    end
+  end
+
+  describe "#replied_children" do
+    it "returns children who have replied" do
       allow(subject).to receive(:children).and_return([
-        double(:replied_at => Time.now),
-        double(:replied_at => Time.now)
+        child1 = double(:replied_at => Time.now),
+        child2 = double(:replied_at => Time.now),
+        child3 = double(:replied_at => nil)
       ])
+      expect(subject.replied_children).to match_array([child1, child2])
+    end
+  end
+
+  describe "#all_children_replied?" do
+    it "returns true if #replied_children equals tree size" do
+      allow(subject).to receive(:replied_children).and_return(Array.new(2, :foo))
       expect(subject.all_children_replied?).to eq(true)
     end
 
-    it "returns false if some children have not replied" do
-      allow(subject).to receive(:children).and_return([
-        double(:replied_at => Time.now),
-        double(:replied_at => nil)
-      ])
-      expect(subject.all_children_replied?).to eq(false)
-    end
-
-    it "returns false if num of replied children not equal to tree size" do
-      allow(subject).to receive(:children).and_return([
-        double(:replied_at => Time.now)
-      ])
+    it "returns false if #replied_children does not equal tree size" do
+      allow(subject).to receive(:replied_children).and_return(Array.new(1, :foo))
       expect(subject.all_children_replied?).to eq(false)
     end
   end
