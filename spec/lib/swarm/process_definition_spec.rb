@@ -18,6 +18,8 @@ RSpec.describe Swarm::ProcessDefinition do
 
   describe ".create_from_json" do
     context "when json only contains tree" do
+      let(:json) { File.read(fixtures_path.join('no_metadata_process.json')) }
+
       it "sets tree to parsed tree from JSON" do
         expect(subject.tree).to eq(parsed_json)
       end

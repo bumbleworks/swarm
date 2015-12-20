@@ -85,7 +85,7 @@ module Swarm
       }
 
       rule(:metadata) {
-        (metadata_entry >> eol).repeat(0) >> str('--') >> eol
+        str('---') >> eol >> (metadata_entry >> eol).repeat(0) >> str('---') >> eol
       }
 
       rule(:document) { whitespace >> metadata.maybe.as(:metadata) >> branch_block.as(:tree) >> whitespace }

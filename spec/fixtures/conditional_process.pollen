@@ -1,8 +1,9 @@
+---
 name: conditional_process
 title: "Conditional Process"
 description: "Process to test conditional arguments and blocks"
 version: 1.0
---
+---
 sequence do
   sequence "if" => "ghosts == 'real'" do
     trace "ghosts are real!"

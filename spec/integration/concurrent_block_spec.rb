@@ -1,10 +1,10 @@
 RSpec.describe Swarm::Process, :type => :process do
-  let(:json) { File.read(fixture_path) }
-  let(:definition) { Swarm::ProcessDefinition.create_from_json(json) }
+  let(:pollen) { File.read(fixture_path) }
+  let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
   subject { definition.launch_process({}) }
 
   context "with concurrence block" do
-    let(:fixture_path) { fixtures_path.join('concurrence_process.json') }
+    let(:fixture_path) { fixtures_path.join('concurrence_process.pollen') }
 
     it "calls all children concurrently" do
       subject

@@ -1,0 +1,7 @@
+sequence do
+  concurrence do
+    defer
+    defer
+  end
+  trace "concurrence done"
+end

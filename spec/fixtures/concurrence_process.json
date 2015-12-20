@@ -1,7 +1,10 @@
-["sequence", {}, [
-  ["concurrence", {}, [
-    ["defer", {}, []],
-    ["defer", {}, []]
-  ]],
-  ["trace", { "text": "concurrence done" }, []]
-]]
+{
+  "definition":
+    ["sequence", {}, [
+      ["concurrence", {}, [
+        ["defer", {}, []],
+        ["defer", {}, []]
+      ]],
+      ["trace", { "text": "concurrence done" }, []]
+    ]]
+}

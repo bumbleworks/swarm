@@ -17,6 +17,13 @@ RSpec.describe Swarm::Pollen::Reader do
         expect(subject.to_hash).to eq(JSON.parse(json))
       end
     end
+
+    context "with process containing argument-less commands" do
+      let(:process_type) { "concurrence_process" }
+      it "should return hash of transformed pollen" do
+        expect(subject.to_hash).to eq(JSON.parse(json))
+      end
+    end
   end
 
   describe "#to_json" do

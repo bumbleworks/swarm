@@ -42,6 +42,9 @@ module Swarm
         }]
       }
 
+      rule(:command => simple(:command)) {
+        [command.to_s, {}, []]
+      }
       rule(:command => simple(:command), :tree => subtree(:tree)) {
         [command.to_s, {}, tree]
       }
