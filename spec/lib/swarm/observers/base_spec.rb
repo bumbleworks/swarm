@@ -1,37 +1,37 @@
 require "swarm/observers/base"
 
 RSpec.describe Swarm::Observers::Base do
-  let(:worker_job) { Swarm::Engine::Worker::Job.new(command: "brog", metadata: "foober") }
-  subject { described_class.new(worker_job) }
+  let(:command) { Swarm::Engine::Worker::Command.new(action: "brog", metadata: { foo: "ber" }) }
+  subject { described_class.new(command) }
 
-  describe "#command" do
-    it "delegates to job" do
-      expect(subject.command).to eq("brog")
+  describe "#action" do
+    it "delegates to command" do
+      expect(subject.action).to eq("brog")
     end
   end
 
   describe "#metadata" do
-    it "delegates to job" do
-      expect(subject.metadata).to eq("foober")
+    it "delegates to command" do
+      expect(subject.metadata).to eq({ foo: "ber" })
     end
   end
 
   describe "#object" do
-    it "delegates to job" do
-      allow(worker_job).to receive(:object).and_return(:a_copper_robber)
+    it "delegates to command" do
+      allow(command).to receive(:object).and_return(:a_copper_robber)
       expect(subject.object).to eq(:a_copper_robber)
     end
   end
 
-  describe "#before_command" do
+  describe "#before_action" do
     it "exists and does nothing" do
-      expect { subject.before_command }.not_to raise_error
+      expect { subject.before_action }.not_to raise_error
     end
   end
 
-  describe "#after_command" do
+  describe "#after_action" do
     it "exists and does nothing" do
-      expect { subject.after_command }.not_to raise_error
+      expect { subject.after_action }.not_to raise_error
     end
   end
 end

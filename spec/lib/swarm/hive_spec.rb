@@ -74,7 +74,7 @@ RSpec.describe Swarm::Hive do
   describe "#queue" do
     it "adds job to work queue" do
       expect(work_queue).to receive(:add_job).with({
-        :command => "do_something_to",
+        :action => "do_something_to",
         :metadata => "my_favorite_thing"
       })
       subject.queue("do_something_to", double(:to_hash => "my_favorite_thing"))

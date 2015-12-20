@@ -3,15 +3,15 @@ module Swarm
     class Base
       extend Forwardable
 
-      def_delegators :job, :command, :metadata, :object
-      attr_reader :job
+      def_delegators :command, :action, :metadata, :object
+      attr_reader :command
 
-      def initialize(job)
-        @job = job
+      def initialize(command)
+        @command = command
       end
 
-      def before_command; end
-      def after_command; end
+      def before_action; end
+      def after_action; end
     end
   end
 end

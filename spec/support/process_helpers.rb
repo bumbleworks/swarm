@@ -17,7 +17,7 @@ module ProcessHelpers
 
   def wait_until_worker_idle
     wait_until(initial_delay: 0.1) {
-      work_queue.tube.peek(:ready).nil? && @worker_thread.stop?
+      work_queue.idle? && @worker_thread.stop?
     }
   end
 end

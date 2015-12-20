@@ -1,12 +1,12 @@
 RSpec.describe Swarm::Engine::Worker do
   subject { described_class.new }
-  let(:worker_job) { described_class::Job.new(command: "spew", metadata: {}, hive: hive) }
+  let(:command) { described_class::Command.new(action: "spew", metadata: {}, hive: hive) }
 
   before(:each) {
     allow(work_queue).to receive(:clone).and_return(work_queue)
-    allow(described_class::Job).to receive(:from_queued_job).
+    allow(described_class::Command).to receive(:from_job).
       with(:a_queued_job, hive: hive).
-      and_return(worker_job)
+      and_return(command)
   }
 
   describe "#working?" do
@@ -51,12 +51,12 @@ RSpec.describe Swarm::Engine::Worker do
 
   describe "#work_on" do
     it "pulls command and metadata from JSON job body and runs the command" do
-      expect(worker_job).to receive(:run_command!)
+      expect(command).to receive(:run!)
       subject.work_on(:a_queued_job)
     end
 
     it "stops worker and cleans up if job contains special 'stop_worker' command" do
-      allow(worker_job).to receive(:stop_job?).and_return(true)
+      allow(command).to receive(:stop?).and_return(true)
       expect(work_queue).to receive(:remove_worker).with(subject, :stop_job => :a_queued_job).ordered
       expect(subject).to receive(:stop!).ordered
       subject.work_on(:a_queued_job)
@@ -73,7 +73,7 @@ RSpec.describe Swarm::Engine::Worker do
     end
 
     it "retries if job reservation fails" do
-      expect(work_queue).to receive(:reserve_job).and_raise(Swarm::Engine::WorkQueue::JobReservationFailed).twice
+      expect(work_queue).to receive(:reserve_job).and_raise(Swarm::Engine::Queue::JobReservationFailed).twice
       expect(work_queue).to receive(:reserve_job).and_return(:the_job)
       expect(subject).to receive(:work_on).with(:the_job)
       expect(work_queue).to receive(:delete_job).with(:the_job)

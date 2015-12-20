@@ -1,26 +1,27 @@
-require "beaneater"
+require_relative "channel"
 
 module Swarm
   module Engine
-    class WorkQueue
+    class Queue
       class JobReservationFailed < StandardError; end
 
-      attr_reader :tube, :name
+      attr_reader :name
 
-      def initialize(name:, address: "localhost:11300")
+      def initialize(name:)
         @name = name
-        @address = address
-        @beaneater = Beaneater.new(@address)
-        @tube = @beaneater.tubes[@name]
+      end
+
+      def channel
+        raise "Not implemented yet!"
       end
 
       def add_job(hsh)
-        tube.put(hsh.to_json)
+        channel.put(hsh)
       end
 
       def reserve_job
-        tube.reserve
-      rescue Beaneater::JobNotReserved, Beaneater::NotFoundError, Beaneater::TimedOutError
+        channel.reserve(self)
+      rescue Channel::JobNotFoundError, Job::AlreadyReservedError
         raise JobReservationFailed
       end
 
@@ -45,15 +46,19 @@ module Swarm
       end
 
       def worker_count
-        tube.stats.current_watching
+        channel.worker_count
       end
 
       def clear
-        tube.clear
+        channel.clear
+      end
+
+      def idle?
+        channel.empty?
       end
 
       def clone
-        self.class.new(:name => @name, :address => @address)
+        @clone ||= self.class.new(:name => name)
       end
     end
   end

@@ -45,9 +45,9 @@ module Swarm
       storage["trace"] = traced + [new_element]
     end
 
-    def queue(command, object)
+    def queue(action, object)
       @work_queue.add_job({
-        :command => command,
+        :action => action,
         :metadata => object.to_hash
       })
     end

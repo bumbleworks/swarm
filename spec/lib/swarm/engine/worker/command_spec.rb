@@ -1,32 +1,32 @@
-RSpec.describe Swarm::Engine::Worker::Job do
+RSpec.describe Swarm::Engine::Worker::Command do
   let(:metadata) { { "foo" => "bar" } }
-  let(:job_arguments) { { command: "fight", metadata: metadata } }
+  let(:job_arguments) { { action: "fight", metadata: metadata } }
   subject { described_class.new(**job_arguments) }
 
-  describe ".from_queued_job" do
-    it "parses command and metadata from queued job and instantiates Worker::Job" do
-      job = double(:body => job_arguments.to_json)
-      expect(described_class.from_queued_job(job, hive: hive)).to eq(subject)
+  describe ".from_job" do
+    it "parses action and metadata from queued job and instantiates Worker::Command" do
+      job = double(:to_h => job_arguments)
+      expect(described_class.from_job(job, hive: hive)).to eq(subject)
     end
   end
 
   describe "#to_hash" do
-    it "returns hash of relevant job data" do
+    it "returns hash of relevant command data" do
       allow(subject).to receive(:object).and_return(:the_object)
       expect(subject.to_hash).to eq({
-        command: "fight",
-        metadata: { "foo" => "bar" },
+        action: "fight",
+        metadata: { :foo => "bar" },
         object: :the_object
       })
     end
   end
 
-  describe "#run_command!" do
-    it "sends given command to object" do
+  describe "#run!" do
+    it "sends given action to object" do
       hive_dweller = double
       allow(subject).to receive(:object).and_return(hive_dweller)
       expect(hive_dweller).to receive(:_fight)
-      subject.run_command!
+      subject.run!
     end
 
     it "calls observer callbacks before and after" do
@@ -34,17 +34,17 @@ RSpec.describe Swarm::Engine::Worker::Job do
       hive_dweller = double
       allow(subject).to receive(:object).and_return(hive_dweller)
       allow(subject).to receive(:observers).and_return([foo_observer, bar_observer])
-      expect(foo_observer).to receive(:before_command).ordered
-      expect(bar_observer).to receive(:before_command).ordered
+      expect(foo_observer).to receive(:before_action).ordered
+      expect(bar_observer).to receive(:before_action).ordered
       expect(hive_dweller).to receive(:_fight).ordered
-      expect(foo_observer).to receive(:after_command).ordered
-      expect(bar_observer).to receive(:after_command).ordered
-      subject.run_command!
+      expect(foo_observer).to receive(:after_action).ordered
+      expect(bar_observer).to receive(:after_action).ordered
+      subject.run!
     end
 
     it "raises an exception if no object" do
       expect {
-        subject.run_command!
+        subject.run!
       }.to raise_error(described_class::MissingObjectError)
     end
   end
@@ -77,14 +77,14 @@ RSpec.describe Swarm::Engine::Worker::Job do
     end
   end
 
-  describe "#stop_job?" do
-    it "returns true if command is 'stop_worker'" do
-      allow(subject).to receive(:command).and_return("stop_worker")
-      expect(subject.stop_job?).to eq(true)
+  describe "#stop?" do
+    it "returns true if action is 'stop_worker'" do
+      allow(subject).to receive(:action).and_return("stop_worker")
+      expect(subject.stop?).to eq(true)
     end
 
-    it "returns false if command is not 'stop_worker'" do
-      expect(subject.stop_job?).to eq(false)
+    it "returns false if action is not 'stop_worker'" do
+      expect(subject.stop?).to eq(false)
     end
   end
 end

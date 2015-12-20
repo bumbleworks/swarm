@@ -1,10 +1,20 @@
-RSpec.describe Swarm::Engine::WorkQueue do
-  let(:job) { instance_double(Beaneater::Job) }
-  subject { work_queue }
+RSpec.describe Swarm::Engine::Volatile::Queue do
+  let(:channel) { Swarm::Engine::Volatile::Channel.new }
+  let(:job) { instance_double(Swarm::Engine::Volatile::Job) }
+  subject { described_class.new(:name => "dummy_queue") }
+
+  describe ".new" do
+    it "connects to channel with given name and adds self as worker" do
+      allow(Swarm::Engine::Volatile::Channel).to receive(:find_or_create).
+        with("dummy_queue").and_return(channel)
+      expect(subject.channel).to eq(channel)
+      expect(channel.workers).to include(subject)
+    end
+  end
 
   describe "#add_job" do
     it "puts JSON version of job into queue" do
-      expect(subject.tube).to receive(:put).with({ :a => :b }.to_json)
+      expect(subject.channel).to receive(:put).with({ :a => :b })
       subject.add_job({ :a => :b })
     end
   end
@@ -12,7 +22,7 @@ RSpec.describe Swarm::Engine::WorkQueue do
   describe "#reserve_job" do
     shared_examples "a job reservation failure" do |reservation_exception|
       it "raises JobReservationFailed exception when #{reservation_exception.class} raised" do
-        allow(subject.tube).to receive(:reserve).and_raise(reservation_exception)
+        allow(subject.channel).to receive(:reserve).and_raise(reservation_exception)
         expect {
           subject.reserve_job
         }.to raise_error(described_class::JobReservationFailed)
@@ -20,16 +30,15 @@ RSpec.describe Swarm::Engine::WorkQueue do
     end
 
     it "reserves next job in tube" do
-      allow(subject.tube).to receive(:reserve).and_return(:the_job)
+      allow(subject.channel).to receive(:reserve).with(subject).and_return(:the_job)
       expect(subject.reserve_job).to eq(:the_job)
     end
 
-    it_behaves_like "a job reservation failure", Beaneater::JobNotReserved.new
-    it_behaves_like "a job reservation failure", Beaneater::NotFoundError.new(nil, nil)
-    it_behaves_like "a job reservation failure", Beaneater::TimedOutError.new(nil, nil)
+    it_behaves_like "a job reservation failure", Swarm::Engine::Volatile::Channel::JobNotFoundError.new
+    it_behaves_like "a job reservation failure", Swarm::Engine::Volatile::Job::AlreadyReservedError.new
 
     it "does not rescue non-job-reservation errors" do
-      allow(subject.tube).to receive(:reserve).and_raise(ArgumentError.new("phosh"))
+      allow(subject.channel).to receive(:reserve).and_raise(ArgumentError.new("phosh"))
       expect {
         subject.reserve_job
       }.to raise_error(ArgumentError, "phosh")
@@ -100,26 +109,23 @@ RSpec.describe Swarm::Engine::WorkQueue do
   end
 
   describe "#worker_count" do
-    it "returns count of tube watchers from stats" do
-      allow(subject.tube).to receive(:stats).and_return(double(:current_watching => 34))
+    it "returns count of workers on channel" do
+      allow(subject.channel).to receive(:worker_count).and_return(34)
       expect(subject.worker_count).to eq(34)
     end
   end
 
   describe "#clear" do
-    it "clears tube" do
-      expect(subject.tube).to receive(:clear)
+    it "clears channel" do
+      expect(subject.channel).to receive(:clear)
       subject.clear
     end
   end
 
   describe "#clone" do
-    it "returns new instance with same name and address" do
-      allow(described_class).to receive(:new).with({
-        :name => subject.name,
-        :address => subject.tube.client.connection.address
-      }).and_return(:the_clone)
-      expect(subject.clone).to eq(:the_clone)
+    it "returns new instance with same channel name" do
+      clone = subject.clone
+      expect(clone.name).to eq(subject.name)
     end
   end
 end

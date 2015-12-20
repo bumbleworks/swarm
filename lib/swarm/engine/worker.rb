@@ -1,5 +1,5 @@
 require "beaneater"
-require_relative "worker/job"
+require_relative "worker/command"
 
 module Swarm
   module Engine
@@ -24,7 +24,7 @@ module Swarm
           @working = true
           work_on(@current_job)
           queue.delete_job(@current_job) if @current_job
-        rescue WorkQueue::JobReservationFailed
+        rescue Queue::JobReservationFailed
           retry
         rescue StandardError
           queue.bury_job(@current_job) if @current_job
@@ -49,12 +49,12 @@ module Swarm
       end
 
       def work_on(queue_job)
-        worker_job = Job.from_queued_job(queue_job, hive: hive)
-        if worker_job.stop_job?
+        command = Command.from_job(queue_job, hive: hive)
+        if command.stop?
           queue.remove_worker(self, :stop_job => queue_job)
           stop!
         else
-          worker_job.run_command!
+          command.run!
         end
       end
     end

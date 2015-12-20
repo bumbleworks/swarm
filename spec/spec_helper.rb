@@ -23,23 +23,23 @@ RSpec.configure do |config|
   config.before(:suite) do
     Swarm::Hive.default = Swarm::Hive.new(
       :storage => Swarm::Storage.new({}),
-      :work_queue => Swarm::Engine::WorkQueue.new(:name => "swarm-test-queue", :address => "localhost:11300")
+      :work_queue => Swarm::Engine::Volatile::Queue.new(:name => "swarm-test-queue")
     )
   end
 
   config.before(:each) do
     storage["trace"] = nil
+    hive.storage.truncate
     hive.registered_observers.clear
   end
 
   config.around(:each, :type => :process) do |example|
     hive.work_queue.clear
-    hive.storage.truncate
     worker = Swarm::Engine::Worker.new
     @worker_thread = Thread.new {
       worker.run!
     }
     example.run
-    hive.work_queue.add_job({:command => "stop_worker"})
+    hive.work_queue.add_job({:action => "stop_worker"})
   end
 end
