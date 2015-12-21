@@ -39,7 +39,10 @@ module Swarm
 
         def wait_for_job
           delay_time = 0
-          sleep(delay_time += 0.01) until jobs.count > 0
+          until jobs.count > 0
+            delay_time += 0.01 unless delay_time > 1.0
+            sleep(delay_time)
+          end
         end
 
         def reserve_job(worker)
