@@ -2,10 +2,10 @@ module Swarm
   module Engine
     module Volatile
       class Job < Swarm::Engine::Job
-        attr_reader :channel, :data, :id, :reserved_by, :buried
+        attr_reader :queue, :data, :id, :reserved_by, :buried
 
-        def initialize(channel:, data:)
-          @channel = channel
+        def initialize(queue:, data:)
+          @queue = queue
           @data = data
           @id = SecureRandom.uuid
           @reserved_by = nil
@@ -21,11 +21,11 @@ module Swarm
             other.id == id
         end
 
-        def reserve!(client)
-          if reserved_by && reserved_by != client
+        def reserve!(worker)
+          if reserved_by && reserved_by != worker
             raise AlreadyReservedError
           end
-          @reserved_by = client
+          @reserved_by = worker
         end
 
         def reserved?
@@ -45,11 +45,11 @@ module Swarm
         end
 
         def delete
-          channel.delete_job(self)
+          queue.delete_job(self)
         end
 
         def exists?
-          channel.has_job?(self)
+          queue.has_job?(self)
         end
       end
     end

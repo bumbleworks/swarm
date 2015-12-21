@@ -1,7 +1,7 @@
 RSpec.describe Swarm::Engine::Volatile::Job do
-  let(:channel) { Swarm::Engine::Volatile::Channel.new }
+  let(:queue) { Swarm::Engine::Volatile::Queue.new(name: "a queue") }
   let(:data) { { "foo" => "bar" } }
-  subject { described_class.new(channel: channel, data: data) }
+  subject { described_class.new(queue: queue, data: data) }
 
   describe ".new" do
     it "sets id to random uuid" do
@@ -24,13 +24,13 @@ RSpec.describe Swarm::Engine::Volatile::Job do
     end
 
     it "returns false if other has different id" do
-      other = described_class.new(channel: channel, data: data)
+      other = described_class.new(queue: queue, data: data)
       allow(other).to receive(:id).and_return("some other googat")
       expect(subject).not_to eq(other)
     end
 
     it "returns true if other has same id" do
-      other = described_class.new(channel: channel, data: data)
+      other = described_class.new(queue: queue, data: data)
       allow(other).to receive(:id).and_return(subject.id)
       expect(subject).to eq(other)
     end
@@ -101,20 +101,20 @@ RSpec.describe Swarm::Engine::Volatile::Job do
   end
 
   describe "#delete" do
-    it "deletes self from channel" do
-      expect(subject.channel).to receive(:delete_job).with(subject)
+    it "deletes self from queue" do
+      expect(subject.queue).to receive(:delete_job).with(subject)
       subject.delete
     end
   end
 
   describe "#exists?" do
-    it "returns true if channel has self in job list" do
-      allow(channel).to receive(:has_job?).with(subject).and_return(true)
+    it "returns true if queue has self in job list" do
+      allow(queue).to receive(:has_job?).with(subject).and_return(true)
       expect(subject.exists?).to eq(true)
     end
 
-    it "returns false if channel does not have self in job list" do
-      allow(channel).to receive(:has_job?).with(subject).and_return(false)
+    it "returns false if queue does not have self in job list" do
+      allow(queue).to receive(:has_job?).with(subject).and_return(false)
       expect(subject.exists?).to eq(false)
     end
   end

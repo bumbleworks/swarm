@@ -41,5 +41,6 @@ RSpec.configure do |config|
     }
     example.run
     hive.work_queue.add_job({:action => "stop_worker"})
+    @worker_thread.join
   end
 end

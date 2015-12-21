@@ -1,9 +1,10 @@
-require_relative "channel"
+require_relative "job"
 
 module Swarm
   module Engine
     class Queue
       class JobReservationFailed < StandardError; end
+      class JobNotFoundError < StandardError; end
 
       attr_reader :name
 
@@ -11,18 +12,16 @@ module Swarm
         @name = name
       end
 
-      def channel
+      def prepare_for_work(worker)
         raise "Not implemented yet!"
       end
 
-      def add_job(hsh)
-        channel.put(hsh)
+      def add_job(data)
+        raise "Not implemented yet!"
       end
 
-      def reserve_job
-        channel.reserve(self)
-      rescue Channel::JobNotFoundError, Job::AlreadyReservedError
-        raise JobReservationFailed
+      def reserve_job(worker)
+        raise "Not implemented yet!"
       end
 
       def delete_job(job)
@@ -45,20 +44,16 @@ module Swarm
         end
       end
 
-      def worker_count
-        channel.worker_count
-      end
-
       def clear
-        channel.clear
+        raise "Not implemented yet!"
       end
 
       def idle?
-        channel.empty?
+        raise "Not implemented yet!"
       end
 
-      def clone
-        @clone ||= self.class.new(:name => name)
+      def worker_count
+        raise "Not implemented yet!"
       end
     end
   end

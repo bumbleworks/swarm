@@ -4,33 +4,35 @@ RSpec.describe Swarm::Engine::Beanstalk::Queue do
 
   describe "#add_job" do
     it "puts JSON version of job into queue" do
-      expect(subject.channel).to receive(:put).with({ :a => :b })
-      subject.add_job({ :a => :b })
+      expect(subject.tube).to receive(:put).with({ :a => :b }.to_json).
+        and_return(:the_job)
+      expect(subject.add_job({ :a => :b })).to eq(:the_job)
     end
   end
 
   describe "#reserve_job" do
     shared_examples "a job reservation failure" do |reservation_exception|
       it "raises JobReservationFailed exception when #{reservation_exception.class} raised" do
-        allow(subject.channel).to receive(:reserve).and_raise(reservation_exception)
+        allow(subject.tube).to receive(:reserve).and_raise(reservation_exception)
         expect {
-          subject.reserve_job
+          subject.reserve_job(:a_worker)
         }.to raise_error(described_class::JobReservationFailed)
       end
     end
 
     it "reserves next job in tube" do
-      allow(subject.channel).to receive(:reserve).with(subject).and_return(:the_job)
-      expect(subject.reserve_job).to eq(:the_job)
+      allow(subject.tube).to receive(:reserve).and_return(:the_job)
+      expect(subject.reserve_job(:a_worker)).to eq(:the_job)
     end
 
-    it_behaves_like "a job reservation failure", Swarm::Engine::Beanstalk::Channel::JobNotFoundError.new
-    it_behaves_like "a job reservation failure", Swarm::Engine::Job::AlreadyReservedError.new
+    it_behaves_like "a job reservation failure", Beaneater::JobNotReserved.new
+    it_behaves_like "a job reservation failure", Beaneater::NotFoundError.new(nil, nil)
+    it_behaves_like "a job reservation failure", Beaneater::TimedOutError.new(nil, nil)
 
     it "does not rescue non-job-reservation errors" do
-      allow(subject.channel).to receive(:reserve).and_raise(ArgumentError.new("phosh"))
+      allow(subject.tube).to receive(:reserve).and_raise(ArgumentError.new("phosh"))
       expect {
-        subject.reserve_job
+        subject.reserve_job(:a_worker)
       }.to raise_error(ArgumentError, "phosh")
     end
   end
@@ -99,24 +101,40 @@ RSpec.describe Swarm::Engine::Beanstalk::Queue do
   end
 
   describe "#worker_count" do
-    it "returns count from channel" do
-      allow(subject.channel).to receive(:worker_count).and_return(34)
+    it "returns count from tube" do
+      allow(subject.tube).to receive(:stats).and_return(double(:current_watching => 34))
       expect(subject.worker_count).to eq(34)
     end
   end
 
   describe "#clear" do
-    it "clears channel" do
-      expect(subject.channel).to receive(:clear)
+    it "clears tube" do
+      expect(subject.tube).to receive(:clear)
       subject.clear
     end
   end
 
-  describe "#clone" do
-    it "returns new instance with same name and address" do
-      clone = subject.clone
+  describe "#prepare_for_work" do
+    it "returns clone with worker assigned" do
+      clone = subject.prepare_for_work(:the_worker)
+      expect(clone).not_to be(subject)
       expect(clone.name).to eq(subject.name)
       expect(clone.address).to eq(subject.address)
+      expect(clone.worker).to eq(:the_worker)
+    end
+  end
+
+  describe "#idle?" do
+    it "returns true if tube has no ready jobs" do
+      expect(subject.tube).to receive(:peek).with(:ready).
+        and_return(nil)
+      expect(subject).to be_idle
+    end
+
+    it "returns false if tube has ready jobs" do
+      expect(subject.tube).to receive(:peek).with(:ready).
+        and_return(:a_job)
+      expect(subject).not_to be_idle
     end
   end
 end

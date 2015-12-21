@@ -4,23 +4,34 @@ require_relative "worker/command"
 module Swarm
   module Engine
     class Worker
+      class NotRunningError < StandardError; end
+
       attr_reader :hive, :queue
 
       def initialize(hive: Hive.default)
         @hive = hive
-        @queue = hive.work_queue.clone
+      end
+
+      def setup
+        @queue = hive.work_queue.prepare_for_work(self)
+      end
+
+      def teardown
+        @queue = nil
       end
 
       def run!
+        setup
         @running = true
         while running?
           process_next_job
         end
+        teardown
       end
 
       def process_next_job
         begin
-          @current_job = queue.reserve_job
+          @current_job = queue.reserve_job(self)
           @working = true
           work_on(@current_job)
           queue.delete_job(@current_job) if @current_job
@@ -40,7 +51,7 @@ module Swarm
       end
 
       def running?
-        @running == true
+        @running == true && queue
       end
 
       def stop!
@@ -49,6 +60,7 @@ module Swarm
       end
 
       def work_on(queue_job)
+        raise NotRunningError unless running?
         command = Command.from_job(queue_job, hive: hive)
         if command.stop?
           queue.remove_worker(self, :stop_job => queue_job)
