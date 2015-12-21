@@ -1,4 +1,4 @@
-RSpec.describe Swarm::Process, :type => :process do
+RSpec.describe Swarm::Process, :process => true do
   let(:pollen) { File.read(fixture_path) }
   let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
   subject { definition.launch_process({}) }

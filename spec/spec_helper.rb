@@ -33,7 +33,7 @@ RSpec.configure do |config|
     hive.registered_observers.clear
   end
 
-  config.around(:each, :type => :process) do |example|
+  config.around(:each, :process => true) do |example|
     hive.work_queue.clear
     worker = Swarm::Engine::Worker.new
     @worker_thread = Thread.new {
