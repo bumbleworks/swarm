@@ -1,5 +1,7 @@
 module Swarm
   class HiveDweller
+    class RecordNotFoundError < StandardError; end
+
     attr_reader :hive, :id
 
     def initialize(hive: Hive.default, **args)

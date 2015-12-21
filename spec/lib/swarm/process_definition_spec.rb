@@ -46,14 +46,27 @@ RSpec.describe Swarm::ProcessDefinition do
     end
   end
 
+  describe ".find_by_name" do
+    it "returns the saved process definition with the given name" do
+      one = described_class.create(:name => "one")
+      two = described_class.create(:name => "two")
+      expect(described_class.find_by_name("one")).to eq(one)
+      expect(described_class.find_by_name("two")).to eq(two)
+    end
+
+    it "returns nil if no definition found with given name" do
+      expect(described_class.find_by_name("three")).to be_nil
+    end
+  end
+
   describe "#launch_process" do
     it "creates and launches process from this definition" do
       process = instance_double(Swarm::Process)
       expect(subject).to receive(:create_process).
-        with("the workitem").
+        with(workitem: "the workitem", arg2: "arg2").
         and_return(process)
       expect(process).to receive(:launch)
-      subject.launch_process("the workitem")
+      subject.launch_process(workitem: "the workitem", arg2: "arg2")
     end
   end
 
@@ -62,16 +75,17 @@ RSpec.describe Swarm::ProcessDefinition do
       allow(Swarm::Process).to receive(:create).with({
         :hive => hive,
         :process_definition_id => subject.id,
-        :workitem => "the workitem"
+        :workitem => "the workitem",
+        :arg2 => "arg2"
       }).and_return(:the_process)
 
-      expect(subject.create_process("the workitem")).to eq(:the_process)
+      expect(subject.create_process(workitem: "the workitem", arg2: "arg2")).to eq(:the_process)
     end
 
     it "raises error if definition has not been saved" do
       allow(subject).to receive(:id).and_return(nil)
       expect {
-        subject.create_process("the workitem")
+        subject.create_process(workitem: "the workitem")
       }.to raise_error(described_class::NotYetPersistedError)
     end
   end

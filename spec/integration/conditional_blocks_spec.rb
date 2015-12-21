@@ -1,7 +1,7 @@
 RSpec.describe Swarm::Process, :process => true do
   let(:json) { File.read(fixture_path) }
   let(:definition) { Swarm::ProcessDefinition.create_from_json(json) }
-  subject { definition.launch_process({ "ghosts" => "fake" }) }
+  subject { definition.launch_process(workitem: { "ghosts" => "fake" }) }
 
   context "with conditional blocks" do
     let(:fixture_path) { fixtures_path.join('conditional_process.json') }

@@ -1,7 +1,7 @@
 RSpec.describe Swarm::Process, :process => true do
   let(:pollen) { File.read(fixture_path) }
   let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
-  subject { definition.launch_process({}) }
+  subject { definition.launch_process(workitem: {}) }
 
   context "with concurrence block" do
     let(:fixture_path) { fixtures_path.join('concurrence_process.pollen') }

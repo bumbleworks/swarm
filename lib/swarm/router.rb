@@ -6,7 +6,7 @@ module Swarm
         expression_type = case command
         when "if", "unless"
           "conditional"
-        when "sequence", "concurrence"
+        when "sequence", "concurrence", "subprocess"
           command
         else
           "activity"

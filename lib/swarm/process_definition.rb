@@ -28,19 +28,25 @@ module Swarm
           }
         end
       end
+
+      def find_by_name(name)
+        detect { |definition| definition.name == name }
+      end
     end
 
-    def create_process(workitem)
+    def create_process(workitem:, **args)
       raise NotYetPersistedError unless id
       Process.create(
-        :hive => hive,
-        :process_definition_id => id,
-        :workitem => workitem
+        args.merge({
+          :workitem => workitem,
+          :hive => hive,
+          :process_definition_id => id
+        })
       )
     end
 
-    def launch_process(workitem)
-      process = create_process(workitem)
+    def launch_process(workitem:, **args)
+      process = create_process(workitem: workitem, **args)
       process.launch
     end
   end

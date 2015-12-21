@@ -2,8 +2,9 @@ require "timeout"
 
 module Swarm
   class Process < HiveDweller
-    set_columns :process_definition_id, :workitem, :root_expression_id
+    set_columns :process_definition_id, :workitem, :root_expression_id, :parent_expression_id
     many_to_one :process_definition, :class_name => "Swarm::ProcessDefinition"
+    many_to_one :parent_expression, :class_name => "Swarm::Expression"
 
     def wait_until_finished(timeout: 5)
       Swarm::Support.wait_until(timeout: timeout) { finished? }
@@ -48,6 +49,9 @@ module Swarm
     def move_on_from(expression)
       self.workitem = expression.workitem
       save
+      if parent_expression
+        parent_expression.move_on_from(self)
+      end
     end
   end
 end

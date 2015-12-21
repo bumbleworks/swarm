@@ -94,6 +94,24 @@ RSpec.describe Swarm::Process do
     end
   end
 
+  describe "#parent_expression" do
+    before(:each) do
+      allow(Swarm::Expression).to receive(:fetch).
+        with('789', hive: hive).
+        and_return(:the_expression)
+    end
+
+    it "fetches parent expression from launch" do
+      allow(subject).to receive(:parent_expression_id).and_return('789')
+      expect(subject.parent_expression).to eq(:the_expression)
+    end
+
+    it "returns nil if no parent_expression_id" do
+      allow(subject).to receive(:parent_expression_id).and_return(nil)
+      expect(subject.parent_expression).to be_nil
+    end
+  end
+
   describe "#root_expression" do
     before(:each) do
       allow(Swarm::Expression).to receive(:fetch).
@@ -126,10 +144,16 @@ RSpec.describe Swarm::Process do
 
   describe "#move_on_from" do
     it "sets the workitem to the given child expression's workitem and saves" do
-      expect(subject.workitem).to eq("the workitem")
       expression = instance_double(Swarm::Expression, :workitem => "a_new_workitem")
       subject.move_on_from(expression)
       expect(subject.reload!.workitem).to eq("a_new_workitem")
+    end
+
+    it "tells parent to move on if parent exists" do
+      parent_expression = double(Swarm::Expression)
+      allow(subject).to receive(:parent_expression).and_return(parent_expression)
+      expect(parent_expression).to receive(:move_on_from).with(subject)
+      subject.move_on_from(double(Swarm::Expression, :workitem => "a_new_workitem"))
     end
   end
 end
