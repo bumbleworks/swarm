@@ -1,3 +1,7 @@
+---
+name: trace_process
+title: "Trace Process"
+---
 sequence do
   trace "first string"
   trace "second string"

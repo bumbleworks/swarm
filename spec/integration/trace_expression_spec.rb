@@ -1,11 +1,9 @@
 RSpec.describe Swarm::Process, :process => true do
-  let(:json) { File.read(fixture_path) }
-  let(:definition) { Swarm::ProcessDefinition.create_from_json(json) }
-  subject { definition.launch_process({}) }
+  let(:pollen) { File.read(fixtures_path.join('trace_process.pollen')) }
+  let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
+  subject { definition.launch_process(:workitem => {}) }
 
   context "with trace expressions" do
-    let(:fixture_path) { fixtures_path.join('trace_process.json') }
-
     it "runs and collects traces from expressions" do
       subject.wait_until_finished
       expect(hive.traced).to eq([
