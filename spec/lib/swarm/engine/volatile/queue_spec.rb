@@ -2,34 +2,40 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
   let(:job) { instance_double(Swarm::Engine::Volatile::Job) }
   subject { described_class.new(:name => "dummy_queue") }
 
-  describe ".find_or_create" do
-    it "returns queue from repository if name already registered" do
-      allow(described_class).to receive(:repository).
-        and_return({ :foo => :the_queue })
-      expect(described_class.find_or_create(:foo)).to eq(:the_queue)
-    end
+  after(:each) do
+    described_class.instance_variable_set(:@tubes, {})
+  end
 
-    it "adds new instance to repository and returns it if name not already registered" do
-      repository_hash = {}
-      allow(described_class).to receive(:new).
-        and_return(:famous_instance)
-      allow(described_class).to receive(:repository).
-        and_return(repository_hash)
-      expect(described_class.find_or_create("foo")).to eq(:famous_instance)
-      expect(repository_hash["foo"]).to eq(:famous_instance)
+  describe ".new" do
+    it "sets tube to named tube from tube list" do
+      expect(described_class).to receive(:get_tube).with("dummy_queue").
+        and_return(:a_tube)
+      expect(subject.tube).to eq(:a_tube)
     end
   end
 
-  describe ".repository" do
-    around(:each) do |example|
-      old_repository = described_class.repository
-      example.run
-      described_class.instance_variable_set(:@repository, old_repository)
+  describe ".get_tube" do
+    it "returns tube from tube list if name already registered" do
+      allow(described_class).to receive(:tubes).
+        and_return({ :foo => :the_tube })
+      expect(described_class.get_tube(:foo)).to eq(:the_tube)
     end
 
+    it "adds new instance to tube list and returns it if name not already registered" do
+      tube_list = {}
+      allow(described_class::Tube).to receive(:new).
+        and_return(:an_awesome_tube)
+      allow(described_class).to receive(:tubes).
+        and_return(tube_list)
+      expect(described_class.get_tube("foo")).to eq(:an_awesome_tube)
+      expect(tube_list["foo"]).to eq(:an_awesome_tube)
+    end
+  end
+
+  describe ".tubes" do
     it "persists a collection at the class level" do
-      described_class.repository[:foo] = "bar"
-      expect(described_class.repository[:foo]).to eq("bar")
+      described_class.tubes[:foo] = "bar"
+      expect(described_class.tubes[:foo]).to eq("bar")
     end
   end
 

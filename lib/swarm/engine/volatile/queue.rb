@@ -4,22 +4,26 @@ module Swarm
   module Engine
     module Volatile
       class Queue < Swarm::Engine::Queue
-        attr_reader :jobs, :workers
+        Tube = Struct.new(:jobs, :workers)
+
+        extend Forwardable
+        def_delegators :tube, :jobs, :workers
+
+        attr_reader :tube, :name
 
         class << self
-          def repository
-            @repository ||= {}
+          def tubes
+            @tubes ||= {}
           end
 
-          def find_or_create(name)
-            repository[name] ||= new(name: name)
+          def get_tube(name)
+            tubes[name] ||= Tube.new([], [])
           end
         end
 
         def initialize(name:)
           @name = name
-          @workers = []
-          @jobs = []
+          @tube = self.class.get_tube(name)
         end
 
         def prepare_for_work(worker)
@@ -58,15 +62,15 @@ module Swarm
         end
 
         def clear
-          @jobs = []
+          tube.jobs = []
         end
 
         def worker_count
-          @workers.count
+          workers.count
         end
 
         def add_worker(worker)
-          @workers << worker
+          workers << worker
         end
 
         def idle?
