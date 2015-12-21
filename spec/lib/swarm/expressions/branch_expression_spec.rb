@@ -4,7 +4,8 @@ RSpec.describe Swarm::BranchExpression do
       :id => 'foo',
       :workitem => { 'foo' => 'bar' },
       :process_id => '123',
-      :parent_id => '456'
+      :parent_id => '456',
+      :position => [3]
     })
   }
 
@@ -49,11 +50,11 @@ RSpec.describe Swarm::BranchExpression do
       allow(Swarm::ActivityExpression).to receive(:create).with({
         :hive => hive,
         :parent_id => "foo",
-        :position => 7,
+        :position => [3, 7],
         :workitem => { "foo" => "bar" },
         :process_id => "123"
       }).and_return(:the_expression)
-      expect(subject.create_child_expression(:node => :a_node, :position => 7)).
+      expect(subject.create_child_expression(:node => :a_node, :at_position => 7)).
         to eq(:the_expression)
     end
   end
@@ -70,7 +71,7 @@ RSpec.describe Swarm::BranchExpression do
       subject.child_ids = ["876"]
       fake_expression = double(:id => "987")
       allow(subject).to receive(:create_child_expression).
-        with(:node => ["whatever", {}, []], :position => 0).
+        with(:node => ["whatever", {}, []], :at_position => 0).
         and_return(fake_expression)
       subject.add_child(0)
       expect(subject.child_ids).to eq(["876", "987"])

@@ -23,7 +23,7 @@ RSpec.describe Swarm::SequenceExpression do
     it "sets workitem to child's workitem and kicks off next child" do
       expect(subject).to receive(:kick_off_children).with([84])
       expect(subject).not_to receive(:reply)
-      subject.move_on_from(double(:workitem => :a_workitem, :position => 83))
+      subject.move_on_from(double(:workitem => :a_workitem, :branch_position => 83))
       expect(subject.workitem).to eq(:a_workitem)
     end
 
@@ -31,7 +31,7 @@ RSpec.describe Swarm::SequenceExpression do
       allow(subject).to receive(:kick_off_children).with([84]).
         and_raise(described_class::InvalidPositionError)
       expect(subject).to receive(:reply)
-      subject.move_on_from(double(:workitem => :a_workitem, :position => 83))
+      subject.move_on_from(double(:workitem => :a_workitem, :branch_position => 83))
     end
   end
 end

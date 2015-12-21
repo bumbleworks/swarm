@@ -16,6 +16,10 @@ module Swarm
     set_columns :parent_id, :position, :workitem, :child_ids, :milestones, :process_id
     many_to_one :process, :class_name => "Swarm::Process"
 
+    def branch_position
+      @branch_position ||= position.last
+    end
+
     def evaluator
       @evaluator ||= Swarm::ExpressionEvaluator.new(self)
     end
@@ -78,7 +82,7 @@ module Swarm
     end
 
     def node
-      @node ||= parent.node_at_position(position)
+      @node ||= parent.node_at_position(branch_position)
     end
 
     def command

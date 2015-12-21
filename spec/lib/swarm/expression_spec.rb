@@ -10,6 +10,13 @@ RSpec.describe Swarm::Expression do
     end
   end
 
+  describe "#branch_position" do
+    it "returns last element in position" do
+      subject.position = [0, 1, 3]
+      expect(subject.branch_position).to eq(3)
+    end
+  end
+
   describe "#evaluator" do
     it "returns an ExpressionEvaluator for the expression" do
       evaluator = double(Swarm::ExpressionEvaluator)
@@ -170,7 +177,7 @@ RSpec.describe Swarm::Expression do
 
   describe "#node" do
     it "returns node at expression's position from parent's tree" do
-      subject.position = 8
+      subject.position = [1, 2, 8]
       parent_expression = instance_double(Swarm::SequenceExpression)
       allow(subject).to receive(:parent).
         and_return(parent_expression)

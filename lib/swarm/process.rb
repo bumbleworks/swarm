@@ -18,7 +18,7 @@ module Swarm
       root_expression = SequenceExpression.create(
         :hive => hive,
         :parent_id => id,
-        :position => 0,
+        :position => [0],
         :workitem => workitem,
         :process_id => id
       )

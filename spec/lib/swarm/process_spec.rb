@@ -39,7 +39,7 @@ RSpec.describe Swarm::Process do
         with({
           :hive => hive,
           :parent_id => subject.id,
-          :position => 0,
+          :position => [0],
           :workitem => "the workitem",
           :process_id => subject.id
         }).and_return(root_expression)

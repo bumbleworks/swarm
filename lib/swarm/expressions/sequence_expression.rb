@@ -8,7 +8,7 @@ module Swarm
 
     def move_on_from(child)
       self.workitem = child.workitem
-      kick_off_children([child.position + 1])
+      kick_off_children([child.branch_position + 1])
     rescue InvalidPositionError => e
       reply
     end
