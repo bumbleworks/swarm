@@ -47,6 +47,7 @@ module Swarm
 
     def move_on_from(expression)
       self.workitem = expression.workitem
+      save
     end
   end
 end

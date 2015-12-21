@@ -125,11 +125,11 @@ RSpec.describe Swarm::Process do
   end
 
   describe "#move_on_from" do
-    it "sets the workitem to the given child expression's workitem" do
+    it "sets the workitem to the given child expression's workitem and saves" do
       expect(subject.workitem).to eq("the workitem")
-      expression = instance_double(Swarm::Expression, :workitem => :a_new_workitem)
+      expression = instance_double(Swarm::Expression, :workitem => "a_new_workitem")
       subject.move_on_from(expression)
-      expect(subject.workitem).to eq(:a_new_workitem)
+      expect(subject.reload!.workitem).to eq("a_new_workitem")
     end
   end
 end
