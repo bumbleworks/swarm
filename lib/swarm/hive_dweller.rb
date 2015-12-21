@@ -106,13 +106,14 @@ module Swarm
       end
 
       def many_to_one(type, class_name: nil)
-        klass = Swarm::Support.constantize("#{class_name || type}")
         define_method(type) do
           memo = instance_variable_get(:"@#{type}")
-          memo || instance_variable_set(
-                    :"@#{type}",
-                    klass.fetch(self.send(:"#{type}_id"), :hive => hive)
-                  )
+          memo || begin
+            key = self.send(:"#{type}_id")
+            return nil unless key
+            klass = Swarm::Support.constantize("#{class_name || type}")
+            instance_variable_set(:"@#{type}", klass.fetch(key, :hive => hive))
+          end
         end
         @associations << type
       end
