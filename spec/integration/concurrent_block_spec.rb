@@ -24,8 +24,7 @@ RSpec.describe Swarm::Process, :process => true do
       subject
       wait_until { Swarm::StoredWorkitem.count == 2 }
       Swarm::StoredWorkitem.map(&:proceed)
-      wait_until_worker_idle
-      expect(hive.traced).to eq(["concurrence done"])
+      wait_until { hive.traced == ["concurrence done"] }
     end
   end
 end
