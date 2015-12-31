@@ -1,4 +1,3 @@
-require "beaneater"
 require_relative "worker/command"
 
 module Swarm
