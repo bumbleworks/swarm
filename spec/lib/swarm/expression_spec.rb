@@ -112,15 +112,6 @@ RSpec.describe Swarm::Expression do
       expect(subject).to receive(:reply_to_parent)
       subject._reply
       expect(subject.milestones["replied_at"]).to eq(Time.now.to_i)
-      expect(subject.milestones["finished_at"]).to be_nil
-    end
-
-    it "sets finished_at milestone if root" do
-      subject.parent_id = '123'
-      allow(subject).to receive(:reply_to_parent)
-      subject._reply
-      expect(subject.milestones["replied_at"]).to eq(Time.now.to_i)
-      expect(subject.milestones["finished_at"]).to eq(Time.now.to_i)
     end
   end
 
@@ -141,37 +132,30 @@ RSpec.describe Swarm::Expression do
     end
   end
 
-  describe "#finished_at" do
-    it "returns time from finished_at milestone" do
-      subject.milestones = { "finished_at" => 123456789 }
-      expect(subject.finished_at).to eq(123456789)
-    end
-  end
-
-  describe "#finished?" do
+  describe "#replied?" do
     before(:each) do
       allow(subject).to receive(:reload!)
     end
 
-    it "calls reload! before checking finished_at" do
+    it "calls reload! before checking replied_at" do
       expect(subject).to receive(:reload!).ordered
-      expect(subject).to receive(:finished_at).ordered
-      subject.finished?
+      expect(subject).to receive(:replied_at).ordered
+      subject.replied?
     end
 
-    it "returns true if finished_at not nil" do
-      subject.milestones = { "finished_at" => 123456789 }
-      expect(subject.finished?).to eq(true)
+    it "returns true if replied_at not nil" do
+      subject.milestones = { "replied_at" => 123456789 }
+      expect(subject.replied?).to eq(true)
     end
 
-    it "returns false if finished_at nil" do
-      subject.milestones = { "finished_at" => nil}
-      expect(subject.finished?).to eq(false)
+    it "returns false if replied_at nil" do
+      subject.milestones = { "replied_at" => nil}
+      expect(subject.replied?).to eq(false)
     end
 
-    it "returns false if finished_at missing" do
+    it "returns false if replied_at missing" do
       subject.milestones = {}
-      expect(subject.finished?).to eq(false)
+      expect(subject.replied?).to eq(false)
     end
   end
 

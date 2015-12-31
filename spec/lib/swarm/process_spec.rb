@@ -73,15 +73,15 @@ RSpec.describe Swarm::Process do
 
   describe "#finished?" do
     let(:root_expression) { Swarm::Expression.create }
-    it "returns true if root expression is finished" do
-      allow(root_expression).to receive(:finished?).and_return(true)
+    it "returns true if root expression is replied" do
+      allow(root_expression).to receive(:replied?).and_return(true)
       allow(subject).to receive(:root_expression).
         and_return(root_expression)
       expect(subject).to be_finished
     end
 
-    it "returns false if root expression is not finished" do
-      allow(root_expression).to receive(:finished?).and_return(false)
+    it "returns false if root expression is not replied" do
+      allow(root_expression).to receive(:replied?).and_return(false)
       allow(subject).to receive(:root_expression).
         and_return(root_expression)
       expect(subject).not_to be_finished

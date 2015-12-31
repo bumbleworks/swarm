@@ -57,9 +57,6 @@ module Swarm
 
     def _reply
       set_milestone("replied_at")
-      if root?
-        set_milestone("finished_at")
-      end
       save
       reply_to_parent
     end
@@ -72,13 +69,9 @@ module Swarm
       get_milestone("replied_at")
     end
 
-    def finished_at
-      get_milestone("finished_at")
-    end
-
-    def finished?
+    def replied?
       reload!
-      !!finished_at
+      !!replied_at
     end
 
     def node

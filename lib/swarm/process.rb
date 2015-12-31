@@ -38,7 +38,7 @@ module Swarm
     end
 
     def finished?
-      root_expression && root_expression.finished?
+      root_expression && root_expression.replied?
     end
 
     def node_at_position(position)
