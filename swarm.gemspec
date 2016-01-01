@@ -7,14 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "swarm"
   spec.version       = Swarm::VERSION
   spec.authors       = ["Ravi Gadad"]
-  spec.email         = ["ravi@renewfund.com"]
+  spec.email         = ["ravi@gadad.net"]
 
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com' to prevent pushes to rubygems.org, or delete to allow pushes to any server."
-  end
-
-  spec.summary       = %q{A workflow engine prototype temporary spike work in progress}
-  spec.description   = %q{A workflow engine prototype temporary spike work in progress}
+  spec.summary       = %q{A Ruby workflow engine}
+  spec.description   = %q{A Ruby workflow engine}
   spec.homepage      = "https://github.com/bumbleworks/swarm"
   spec.license       = "MIT"
 
