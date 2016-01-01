@@ -1,8 +1,12 @@
 # Swarm
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/swarm`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![Gem Version](https://badge.fury.io/rb/swarm.svg)](https://badge.fury.io/rb/swarm)
 
-TODO: Delete this and the text above, and describe your gem
+Swarm is a (very much still work-in-progress) workflow engine for Ruby, combining a process definition DSL, a set of built-in expressions, a worker framework to actually run process instances, and a storage mechanism to persist instances and deferred expressions.
+
+Currently it requires Redis as a backend to persist state (though for testing you can use transient in-process memory storage).  The goal is to extract the storage so other backends can be swapped in as the process state repository.
+
+For performing the work itself, Swarm only comes with an in-process memory storage, which means jobs queued up at the time of stopping the worker will be lost.  For a non-volatile worker, you'll want to use [swarm-beanstalk](http://github.com/bumbleworks/swarm-beanstalk), which uses [beanstalkd](http://kr.github.io/beanstalkd/) (via [beaneater](https://github.com/beanstalkd/beaneater)).
 
 ## Installation
 
@@ -22,13 +26,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Instructions coming soon!
 
-## Development
+## Acknowledgements
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Huge thanks to @jmettraux, author of (now discontinued) [ruote](https://github.com/jmettraux/ruote), for getting me excited about workflow engines, and for inspiring this fun and educational project of mine.
 
 ## Contributing
 
