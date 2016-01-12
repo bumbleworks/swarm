@@ -17,7 +17,8 @@ require "swarm/stored_workitem"
 require "swarm/participants/trace_participant"
 require "swarm/participants/storage_participant"
 require "swarm/pollen/reader"
-require "redis"
+require "swarm/storage"
+
 
 module Swarm
   # Your code goes here...

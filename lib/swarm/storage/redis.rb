@@ -1,6 +1,8 @@
+require "redis"
+
 module Swarm
   module Storage
-    class Redis
+    class RedisStorage
       attr_reader :redis_db
 
       def initialize(redis_db)

@@ -1,4 +1,4 @@
-RSpec.describe Swarm::Storage::Hash do
+RSpec.describe Swarm::Storage::HashStorage do
   let(:hash) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
   subject { described_class.new(hash) }
 

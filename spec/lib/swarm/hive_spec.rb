@@ -45,7 +45,7 @@ RSpec.describe Swarm::Hive do
   describe "#inspect" do
     it "reveals storage class and work queue name" do
       expect(subject.inspect).to eq(
-        "#<Swarm::Hive storage: Hash, work_queue: swarm-test-queue>"
+        "#<Swarm::Hive storage: HashStorage, work_queue: swarm-test-queue>"
       )
     end
   end

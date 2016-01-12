@@ -1,6 +1,6 @@
 module Swarm
   module Storage
-    class Hash
+    class HashStorage
       attr_reader :hash
 
       def initialize(hash)

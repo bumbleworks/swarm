@@ -1,4 +1,4 @@
-RSpec.describe Swarm::Storage::Redis do
+RSpec.describe Swarm::Storage::RedisStorage do
   let(:redis_db) { double(Redis) }
   subject { described_class.new(redis_db) }
 

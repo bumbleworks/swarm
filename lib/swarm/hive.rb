@@ -1,5 +1,3 @@
-require_relative "storage"
-
 module Swarm
   class Hive
     class MissingTypeError < StandardError; end
