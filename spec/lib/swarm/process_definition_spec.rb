@@ -73,7 +73,6 @@ RSpec.describe Swarm::ProcessDefinition do
   describe "#create_process" do
     it "creates a new process from this definition" do
       allow(Swarm::Process).to receive(:create).with({
-        :hive => hive,
         :process_definition_id => subject.id,
         :workitem => "the workitem",
         :arg2 => "arg2"

@@ -39,7 +39,6 @@ module Swarm
       Process.create(
         args.merge({
           :workitem => workitem,
-          :hive => hive,
           :process_definition_id => id
         })
       )
