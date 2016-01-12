@@ -55,7 +55,8 @@ module Swarm
     def save
       if new? || changed?
         @id ||= Swarm::Support.uuid_with_timestamp
-        storage[storage_id] = to_hash
+        storage[storage_id] = to_hash.merge(:updated_at => Time.now)
+        reload!
       end
       self
     end
@@ -95,13 +96,21 @@ module Swarm
         super
         subclass.instance_variable_set(:@columns, [])
         subclass.instance_variable_set(:@associations, [])
+        subclass.set_columns :updated_at, :created_at
       end
 
       def set_columns(*args)
-        attr_reader *args
         args.each do |arg|
           define_method("#{arg}=") { |value|
             change_attribute(arg, value)
+          }
+
+          define_method(arg) {
+            val = instance_variable_get(:"@#{arg}")
+            if /_at$/.match(arg) && val.is_a?(String)
+              val = Time.parse(val)
+            end
+            val
           }
         end
         @columns = @columns | args
@@ -121,7 +130,7 @@ module Swarm
       end
 
       def create(hive: Hive.default, **args)
-        new(hive: hive, **args).save
+        new(hive: hive, created_at: Time.now, **args).save
       end
 
       def storage_type

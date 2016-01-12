@@ -3,6 +3,14 @@ RSpec.describe Swarm::ProcessDefinition do
   let(:parsed_json) { JSON.parse(json) }
   subject { described_class.create_from_json(json) }
 
+  before(:each) do
+    Timecop.freeze
+  end
+
+  after(:each) do
+    Timecop.return
+  end
+
   describe ".create_from_pollen" do
     it "transforms pollen to JSON and then delegates to .create_from_json" do
       allow(Swarm::Pollen::Reader).to receive(:new).

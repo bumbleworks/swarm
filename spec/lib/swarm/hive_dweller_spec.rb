@@ -4,25 +4,35 @@ RSpec.describe Swarm::HiveDweller do
       klass.set_columns :horse, :rabbits
     }
   }
+  # This strangeness is due to Timecop being buggy with Time.parse(time.to_s)
+  let(:created_at) { Time.parse((Time.now - 2).to_s) }
+  let(:updated_at) { Time.parse((Time.now - 1).to_s) }
+
   subject {
     test_class.new_from_storage({
-      :hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth"
+      :hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth",
+      :created_at => created_at, :updated_at => updated_at
     })
   }
 
   before(:each) do
+    Timecop.freeze
     allow(test_class).to receive(:name).and_return("Heads::AluminumHead")
+  end
+
+  after(:each) do
+    Timecop.return
   end
 
   describe "#attributes" do
     it "returns values for all columns" do
-      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth")
+      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => created_at, :updated_at => updated_at)
     end
 
     it "returns nil for any attributes not set" do
       test_class.set_columns :alabama
       expect(subject.attributes).to eq(
-        :horse => "fire", :rabbits => "earth", :alabama => nil
+        :horse => "fire", :rabbits => "earth", :alabama => nil, :created_at => created_at, :updated_at => updated_at
       )
     end
   end
@@ -61,7 +71,8 @@ RSpec.describe Swarm::HiveDweller do
   describe "#save" do
     it "stores self in storage if change" do
       subject.horse = "pony"
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:1234", subject.to_hash)
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:1234", subject.to_hash.merge(:updated_at => Time.now))
+      expect(subject).to receive(:reload!)
       subject.save
     end
 
@@ -71,14 +82,15 @@ RSpec.describe Swarm::HiveDweller do
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("123-345-567")
       subject.save
-      expect(hive.storage["AluminumHead:123-345-567"]).to eq({ "foo" => "bar" })
+      expect(hive.storage["AluminumHead:123-345-567"]).to eq({ "foo" => "bar", "updated_at" => Time.now.to_s })
     end
 
     it "saves if new" do
       new_object = test_class.new(:hive => hive)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("9999")
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999", new_object.to_hash.merge(:id => "9999"))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999", new_object.to_hash.merge(:id => "9999", :updated_at => Time.now))
+      expect(new_object).to receive(:reload!)
       new_object.save
     end
 
@@ -101,7 +113,21 @@ RSpec.describe Swarm::HiveDweller do
         :id => "1234",
         :type => "Heads::AluminumHead",
         :horse => "fire",
-        :rabbits => "earth"
+        :rabbits => "earth",
+        :created_at => created_at,
+        :updated_at => updated_at
+      })
+    end
+
+    it "restores timestamp attributes after storage" do
+      hive.storage["AluminumHead:1234"] = subject.to_hash
+      expect(subject.reload!.to_hash).to eq({
+        :id => "1234",
+        :type => "Heads::AluminumHead",
+        :horse => "fire",
+        :rabbits => "earth",
+        :created_at => created_at,
+        :updated_at => updated_at
       })
     end
   end
@@ -145,7 +171,7 @@ RSpec.describe Swarm::HiveDweller do
   describe ".new" do
     it "returns a new instance with columns set" do
       instance = test_class.new(:hive => hive, :horse => "fire", :rabbits => "earth")
-      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth")
+      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => nil, :updated_at => nil)
     end
 
     it "raises an ArgumentError if any arguments are not columns" do
@@ -163,16 +189,16 @@ RSpec.describe Swarm::HiveDweller do
 
   describe ".new_from_storage" do
     it "returns a new instance with id set" do
-      instance = test_class.new_from_storage(:hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth")
-      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth")
-      expect(subject.id).to eq("1234")
+      instance = test_class.new_from_storage(:hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth", :created_at => created_at)
+      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => created_at, :updated_at => nil)
+      expect(instance.id).to eq("1234")
     end
   end
 
   describe ".create" do
     it "instantiates a new object and immediately saves it" do
       new_object = double
-      allow(test_class).to receive(:new).with(hive: hive, args: :the_args).and_return(new_object)
+      allow(test_class).to receive(:new).with(hive: hive, created_at: Time.now, args: :the_args).and_return(new_object)
       expect(new_object).to receive(:save)
       test_class.create(args: :the_args)
     end
@@ -180,18 +206,10 @@ RSpec.describe Swarm::HiveDweller do
 
   describe ".fetch" do
     it "retrieves hash from storage for given key and reifies" do
-      allow(Swarm::Support).to receive(:constantize).with("Heads::AluminumHead").
-        and_return(test_class)
       hive.storage["AluminumHead:1234"] = subject.to_hash
+      allow(hive).to receive(:reify_from_hash).with(hive.storage["AluminumHead:1234"]).
+        and_return(subject)
       expect(test_class.fetch("1234", :hive => hive)).to eq(subject)
-    end
-
-    it "raises exception if object in storage has no type" do
-      bad_hash = subject.to_hash.tap { |hsh| hsh.delete(:type) }
-      hive.storage["AluminumHead:1234"] = bad_hash
-      expect {
-        test_class.fetch("1234", :hive => hive)
-      }.to raise_error(Swarm::Hive::MissingTypeError, bad_hash.inspect)
     end
   end
 
