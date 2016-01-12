@@ -34,7 +34,11 @@ module Swarm
     end
 
     def inspect
-      "#<Swarm::Hive storage: #{storage.backend.class}, work_queue: #{work_queue.name}>"
+      "#<Swarm::Hive storage: #{storage_class}, work_queue: #{work_queue.name}>"
+    end
+
+    def storage_class
+      storage.class.name.split('::').last
     end
 
     def traced

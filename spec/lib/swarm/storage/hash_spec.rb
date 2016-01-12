@@ -1,17 +1,11 @@
-RSpec.describe Swarm::Storage do
-  let(:backend) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
-  subject { described_class.new(backend) }
+RSpec.describe Swarm::Storage::Hash do
+  let(:hash) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
+  subject { described_class.new(hash) }
 
   describe "#ids_for_type" do
     it "returns all ids for given type" do
       expect(subject.ids_for_type("foo")).to eq(["1", "2"])
       expect(subject.ids_for_type("bar")).to eq(["8"])
-    end
-
-    it "works with Redis" do
-      allow(backend).to receive(:is_a?).with(Redis).and_return(true)
-      allow(backend).to receive(:keys).with("foo:*").and_return(["foo:3", "foo:4"])
-      expect(subject.ids_for_type("foo")).to eq(["3", "4"])
     end
   end
 
@@ -40,6 +34,7 @@ RSpec.describe Swarm::Storage do
   describe "#[]" do
     it "returns deserialized version of value at key" do
       allow(subject).to receive(:deserialize).with("le foo").and_return("magic")
+      expect(hash).to receive(:[]).with("foo:1").and_return("le foo")
       expect(subject["foo:1"]).to eq("magic")
     end
   end
@@ -47,34 +42,22 @@ RSpec.describe Swarm::Storage do
   describe "#[]=" do
     it "sets key to serialized version of given value" do
       allow(subject).to receive(:serialize).with("tutu").and_return("synchronized_swimming")
+      expect(hash).to receive(:[]=).with("bar:24", "synchronized_swimming")
       subject["bar:24"] = "tutu"
-      expect(subject.backend["bar:24"]).to eq("synchronized_swimming")
     end
   end
 
   describe "#truncate" do
-    it "clears backend" do
+    it "clears hash" do
       subject.truncate
-      expect(subject.backend).to be_empty
-    end
-
-    it "works with Redis" do
-      # this expectation also makes "respond_to?" return true
-      expect(backend).to receive(:flushdb)
-      subject.truncate
+      expect(subject.hash).to be_empty
     end
   end
 
   describe "#delete" do
-    it "deletes key from backend" do
+    it "deletes key from hash" do
       subject.delete("foo:2")
-      expect(subject.backend).to eq({ "foo:1" => "le foo", "bar:8" => "barp" })
-    end
-
-    it "works with Redis" do
-      # this expectation also makes "respond_to?" return true
-      expect(backend).to receive(:del).with("foo:2")
-      subject.delete("foo:2")
+      expect(subject.hash).to eq({ "foo:1" => "le foo", "bar:8" => "barp" })
     end
   end
 end
