@@ -1,5 +1,5 @@
-require_relative "storage/hash"
-require_relative "storage/redis"
+require_relative "storage/hash_storage"
+require_relative "storage/redis_storage"
 
 module Swarm
   module Storage
