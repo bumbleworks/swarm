@@ -172,7 +172,9 @@ module Swarm
       end
 
       def all(hive: Hive.default, subtypes: true)
-        to_a(hive: hive, subtypes: subtypes)
+        hive.storage.all_of_type(storage_type, subtypes: subtypes).map { |hsh|
+          hive.reify_from_hash(hsh.dup)
+        }
       end
     end
   end

@@ -8,6 +8,13 @@ module Swarm
         keys.map { |key| key.gsub(regex_for_type(type), '\1') }
       end
 
+      def all_of_type(type, subtypes: true)
+        store.select { |key, value|
+          key.match(regex_for_type(type)) &&
+            (subtypes || value["type"] == type)
+        }.values
+      end
+
       def delete(key)
         store.delete(key)
       end

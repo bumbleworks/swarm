@@ -1,5 +1,20 @@
 RSpec.describe Swarm::Storage::HashStorage do
-  let(:hash) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
+  let(:hash) {
+    {
+      "foo:1" => {
+        "type" => "foo",
+        "data" => "le foo"
+      },
+      "foo:2" => {
+        "type" => "pitifoo",
+        "data" => "la foo"
+      },
+      "bar:8" => {
+        "type" => "bar",
+        "data" => "barp"
+      }
+    }
+  }
   subject { described_class.new(hash) }
 
   it "is a KeyValueStorage" do
@@ -13,6 +28,23 @@ RSpec.describe Swarm::Storage::HashStorage do
     end
   end
 
+  describe "#all_of_type" do
+    it "returns all values for given type" do
+      expect(subject.all_of_type("foo")).to eq(
+        hash.values_at("foo:1", "foo:2")
+      )
+      expect(subject.all_of_type("bar")).to eq(
+        hash.values_at("bar:8")
+      )
+    end
+
+    it "excludes subtypes if constrained" do
+      expect(subject.all_of_type("foo", subtypes: false)).to eq(
+        hash.values_at("foo:1")
+      )
+    end
+  end
+
   describe "#truncate" do
     it "clears hash" do
       subject.truncate
@@ -23,7 +55,7 @@ RSpec.describe Swarm::Storage::HashStorage do
   describe "#delete" do
     it "deletes key from hash" do
       subject.delete("foo:2")
-      expect(subject.store).to eq({ "foo:1" => "le foo", "bar:8" => "barp" })
+      expect(subject.store.keys).to eq(["foo:1", "bar:8"])
     end
   end
 end

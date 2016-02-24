@@ -23,6 +23,10 @@ module Swarm
         raise "Not implemented yet!"
       end
 
+      def all_of_type(type)
+        raise "Not implemented yet!"
+      end
+
       def serialize(value)
         return nil if value.nil?
         value.to_json

@@ -273,7 +273,17 @@ RSpec.describe Swarm::HiveDweller do
   end
 
   describe ".all" do
-    it "fetches an instance for every id returned by .ids, if is_a? class" do
+    it "returns all values for storage type" do
+      allow(hive.storage).to receive(:all_of_type).with("AluminumHead", subtypes: true).
+        and_return([double(:dup => :first_hash), double(:dup => :second_hash)])
+      allow(hive).to receive(:reify_from_hash).with(:first_hash).and_return(:first_object)
+      allow(hive).to receive(:reify_from_hash).with(:second_hash).and_return(:second_object)
+      expect(test_class.all(:hive => hive)).to eq([:first_object, :second_object])
+    end
+  end
+
+  describe ".each" do
+    it "yields an instance for every id returned by .ids, if is_a? class" do
       allow(test_class).to receive(:ids).with(:hive => hive).
         and_return(["123", "456", "789", "boo"])
       doubles = ["123", "456", "789"].map do |id|
@@ -283,7 +293,9 @@ RSpec.describe Swarm::HiveDweller do
         }
       end
       allow(test_class).to receive(:fetch).with("boo", :hive => hive).and_return(double(:is_a? => false))
-      expect(test_class.all(:hive => hive)).to eq(doubles)
+      aggregation = []
+      test_class.each(:hive => hive) { |instance| aggregation << instance }
+      expect(aggregation).to eq(doubles)
     end
 
     it "restricts to instances of class specifically if subtypes false" do
@@ -296,7 +308,9 @@ RSpec.describe Swarm::HiveDweller do
       end
       sub_double = double(:class => "Nope", :is_a? => true)
       allow(test_class).to receive(:fetch).with("boo", :hive => hive).and_return(sub_double)
-      expect(test_class.all(:hive => hive, :subtypes => false)).to eq(doubles)
+      aggregation = []
+      test_class.each(:hive => hive, :subtypes => false) { |instance| aggregation << instance }
+      expect(aggregation).to eq(doubles)
     end
   end
 end
