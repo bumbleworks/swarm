@@ -28,7 +28,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    storage["trace"] = nil
+    storage.trace = nil
     hive.storage.truncate
     hive.registered_observers.clear
   end

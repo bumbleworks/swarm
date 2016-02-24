@@ -40,11 +40,11 @@ module Swarm
     end
 
     def traced
-      storage["trace"] ||= []
+      storage.trace ||= []
     end
 
     def trace(new_element)
-      storage["trace"] = traced + [new_element]
+      storage.trace = traced + [new_element]
     end
 
     def queue(action, object)

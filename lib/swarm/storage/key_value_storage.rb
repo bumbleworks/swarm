@@ -7,6 +7,14 @@ module Swarm
         @store = store
       end
 
+      def trace
+        self["trace"]
+      end
+
+      def trace=(traced)
+        self["trace"] = traced
+      end
+
       def regex_for_type(type)
         /^#{type}\:(.*)/
       end
