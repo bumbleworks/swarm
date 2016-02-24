@@ -54,6 +54,24 @@ RSpec.describe Swarm::Support do
     end
   end
 
+  describe '.tokenize' do
+    it 'creates snake_case version of string' do
+      expect(described_class.tokenize('Albus Dumbledore & his_friend')).to eq('albus_dumbledore_and_his_friend')
+    end
+
+    it 'uncamelizes' do
+      expect(described_class.tokenize('thisStrangeJavalikeWord')).to eq('this_strange_javalike_word')
+    end
+
+    it 'returns nil if given nil' do
+      expect(described_class.tokenize(nil)).to be_nil
+    end
+
+    it 'also handles symbols' do
+      expect(described_class.tokenize(:yourFaceIsNice)).to eq('your_face_is_nice')
+    end
+  end
+
   describe '.camelize' do
     it 'turns underscored string into camelcase' do
       expect(described_class.camelize('foo_bar_One_two_3')).to eq('FooBarOneTwo3')

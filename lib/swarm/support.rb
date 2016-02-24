@@ -43,6 +43,14 @@ module Swarm
         "#{Time.now.strftime("%Y%m%d-%H%M%S")}-#{SecureRandom.uuid}"
       end
 
+      def tokenize(string)
+        return nil if string.nil?
+        string = string.to_s.gsub(/&/, ' and ').
+          gsub(/[ \/]+/, '_').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          downcase
+      end
+
       def camelize(string)
         string = string.sub(/^[a-z\d]*/) { $&.capitalize }
         string = string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
