@@ -27,6 +27,17 @@ module Swarm
         raise "Not implemented yet!"
       end
 
+      def load_associations(association_name, owner:, type:, foreign_key: nil)
+        type = type.split("::").last
+        local_association_ids = :"#{association_name}_ids"
+        if owner.respond_to?(local_association_ids)
+          ids = owner.send(local_association_ids) || []
+          ids.map { |id|
+            self["#{type}:#{id}"]
+          }.compact
+        end
+      end
+
       def serialize(value)
         return nil if value.nil?
         value.to_json

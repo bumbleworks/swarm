@@ -13,8 +13,10 @@ module Swarm
       end
     end
 
-    set_columns :parent_id, :position, :workitem, :child_ids, :milestones, :process_id
+    set_columns :parent_id, :position, :workitem, :children_ids, :milestones, :process_id
     many_to_one :process, :class_name => "Swarm::Process"
+    many_to_one :parent, :class_name => "Swarm::Expression", :key => :parent_id
+    one_to_many :children, :class_name => "Swarm::Expression", :foreign_key => :parent_id
 
     def branch_position
       @branch_position ||= position.last

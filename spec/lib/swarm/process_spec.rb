@@ -73,10 +73,11 @@ RSpec.describe Swarm::Process do
 
   describe "#finished?" do
     let(:root_expression) { Swarm::Expression.create }
-    it "returns true if root expression is replied" do
+    it "reloads and returns true if root expression is replied" do
       allow(root_expression).to receive(:replied?).and_return(true)
+      expect(subject).to receive(:reload!).ordered
       allow(subject).to receive(:root_expression).
-        and_return(root_expression)
+        and_return(root_expression).ordered
       expect(subject).to be_finished
     end
 
@@ -130,14 +131,8 @@ RSpec.describe Swarm::Process do
     end
 
     it "does not cache if not found" do
-      allow(subject).to receive(:root_expression_id).and_return(nil, nil, '456')
-      expect(subject.root_expression).to be_nil
-      expect(subject.root_expression).to eq(:the_expression)
-    end
-
-    it "reloads if root_expression_id nil" do
       allow(subject).to receive(:root_expression_id).and_return(nil, '456')
-      expect(subject).to receive(:reload!)
+      expect(subject.root_expression).to be_nil
       expect(subject.root_expression).to eq(:the_expression)
     end
   end

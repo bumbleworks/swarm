@@ -5,6 +5,7 @@ module Swarm
     class NotYetPersistedError < StandardError; end
 
     set_columns :tree, :name, :version
+    one_to_many :processes, :class_name => "Swarm::Process"
 
     class << self
       def create_from_json(json, hive: Hive.default)

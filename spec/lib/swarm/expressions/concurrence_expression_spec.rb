@@ -93,6 +93,7 @@ RSpec.describe Swarm::ConcurrenceExpression do
     it "merges child workitem into current workitem with deep merge and saves" do
       expect(subject).to receive(:merge_child_workitem).with(:fake_child).ordered
       expect(subject).to receive(:save).ordered
+      allow(subject).to receive(:all_children_replied?).and_return(false)
       subject.move_on_from(:fake_child)
     end
   end

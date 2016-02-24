@@ -116,14 +116,29 @@ module Swarm
         @columns = @columns | args
       end
 
-      def many_to_one(type, class_name: nil)
+      def one_to_many(type, class_name: nil, foreign_key: nil)
         define_method(type) do
           memo = instance_variable_get(:"@#{type}")
           memo || begin
-            key = self.send(:"#{type}_id")
-            return nil unless key
+            associations = hive.storage.load_associations(
+              type, owner: self, type: class_name || type, foreign_key: foreign_key
+            )
+            entities = associations.map { |association| hive.reify_from_hash(association) }
+            instance_variable_set(:"@#{type}", entities)
+          end
+        end
+        @associations << type
+      end
+
+      def many_to_one(type, class_name: nil, key: nil)
+        define_method(type) do
+          memo = instance_variable_get(:"@#{type}")
+          memo || begin
+            key ||= :"#{type}_id"
+            associated_id = self.send(key)
+            return nil unless associated_id
             klass = Swarm::Support.constantize("#{class_name || type}")
-            instance_variable_set(:"@#{type}", klass.fetch(key, :hive => hive))
+            instance_variable_set(:"@#{type}", klass.fetch(associated_id, :hive => hive))
           end
         end
         @associations << type

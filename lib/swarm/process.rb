@@ -5,6 +5,8 @@ module Swarm
     set_columns :process_definition_id, :workitem, :root_expression_id, :parent_expression_id
     many_to_one :process_definition, :class_name => "Swarm::ProcessDefinition"
     many_to_one :parent_expression, :class_name => "Swarm::Expression"
+    many_to_one :root_expression, :class_name => "Swarm::Expression"
+    one_to_many :expressions, :class_name => "Swarm::Expression"
 
     def wait_until_finished(timeout: 5)
       Swarm::Support.wait_until(timeout: timeout) { finished? }
@@ -16,28 +18,20 @@ module Swarm
     end
 
     def _launch
-      root_expression = SequenceExpression.create(
+      new_expression = SequenceExpression.create(
         :hive => hive,
         :parent_id => id,
         :position => [0],
         :workitem => workitem,
         :process_id => id
       )
-      root_expression.apply
-      self.root_expression_id = root_expression.id
+      new_expression.apply
+      self.root_expression_id = new_expression.id
       save
     end
 
-    def root_expression
-      @root_expression ||= begin
-        reload! unless root_expression_id
-        if root_expression_id
-          Expression.fetch(root_expression_id, hive: hive)
-        end
-      end
-    end
-
     def finished?
+      reload!
       root_expression && root_expression.replied?
     end
 

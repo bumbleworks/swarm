@@ -4,12 +4,6 @@ module Swarm
   class BranchExpression < Expression
     class InvalidPositionError < StandardError; end;
 
-    def children
-      (child_ids || []).map { |child_id|
-        Expression.fetch(child_id, hive: hive)
-      }
-    end
-
     def kick_off_children(at_positions)
       at_positions.each do |at_position|
         add_and_apply_child(at_position)
@@ -26,7 +20,7 @@ module Swarm
       node = tree[at_position]
       raise InvalidPositionError unless node
       expression = create_child_expression(node: node, at_position: at_position)
-      (self.child_ids ||= []) << expression.id
+      (self.children_ids ||= []) << expression.id
       expression
     end
 

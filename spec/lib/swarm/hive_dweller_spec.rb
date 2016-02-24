@@ -241,6 +241,16 @@ RSpec.describe Swarm::HiveDweller do
       expect(subject.spam_noodle).to eq(:the_object)
     end
 
+    it "allows for override of association key" do
+      allow(subject).to receive(:elephantine_id).and_return("elephantine_id")
+      allow(association_class).to receive(:fetch).
+        with("elephantine_id", :hive => hive).and_return(:the_object)
+      allow(Swarm::Support).to receive(:constantize).
+        with("spam_noodle").and_return(association_class)
+      test_class.many_to_one :spam_noodle, :key => "elephantine_id"
+      expect(subject.spam_noodle).to eq(:the_object)
+    end
+
     it "allows for override of class_name" do
       allow(Swarm::Support).to receive(:constantize).
         with("MyUnclesTruck").and_return(association_class)

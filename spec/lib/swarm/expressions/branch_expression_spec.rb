@@ -19,7 +19,7 @@ RSpec.describe Swarm::BranchExpression do
         Swarm::Expression.create(:hive => hive)
       }
       extra = Swarm::Expression.create(:hive => hive)
-      subject.child_ids = expressions.map(&:id)
+      subject.children_ids = expressions.map(&:id)
       expect(subject.children).to match_array(expressions)
     end
   end
@@ -68,13 +68,13 @@ RSpec.describe Swarm::BranchExpression do
     end
 
     it "creates new expression with given command and adds it to child_ids" do
-      subject.child_ids = ["876"]
+      subject.children_ids = ["876"]
       fake_expression = double(:id => "987")
       allow(subject).to receive(:create_child_expression).
         with(:node => ["whatever", {}, []], :at_position => 0).
         and_return(fake_expression)
       subject.add_child(0)
-      expect(subject.child_ids).to eq(["876", "987"])
+      expect(subject.children_ids).to eq(["876", "987"])
     end
 
     it "raises exception if position doesn't exist in tree" do
