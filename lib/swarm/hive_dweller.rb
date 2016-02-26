@@ -80,8 +80,8 @@ module Swarm
       self.class.columns.each do |column|
         instance_variable_set(:"@#{column}", hsh[column.to_s])
       end
-      self.class.associations.each do |type|
-        instance_variable_set(:"@#{type}", nil)
+      self.class.associations.each do |name, metadata|
+        instance_variable_set(:"@#{name}", nil)
       end
       @changed_attributes = {}
       self
@@ -95,7 +95,7 @@ module Swarm
       def inherited(subclass)
         super
         subclass.instance_variable_set(:@columns, [])
-        subclass.instance_variable_set(:@associations, [])
+        subclass.instance_variable_set(:@associations, {})
         subclass.set_columns :updated_at, :created_at
       end
 
@@ -116,32 +116,41 @@ module Swarm
         @columns = @columns | args
       end
 
-      def one_to_many(type, class_name: nil, foreign_key: nil)
-        define_method(type) do
-          memo = instance_variable_get(:"@#{type}")
+      def one_to_many(association_name, class_name: nil, foreign_key: nil)
+        define_method(association_name) do
+          memo = instance_variable_get(:"@#{association_name}")
           memo || begin
             associations = hive.storage.load_associations(
-              type, owner: self, type: class_name || type, foreign_key: foreign_key
+              association_name, owner: self, class_name: class_name || association_name, foreign_key: foreign_key
             )
             entities = associations.map { |association| hive.reify_from_hash(association) }
-            instance_variable_set(:"@#{type}", entities)
+            instance_variable_set(:"@#{association_name}", entities)
           end
         end
-        @associations << type
+        define_method(:"add_to_#{association_name}") do |associated|
+          hive.storage.add_association(
+            association_name, associated, owner: self, class_name: class_name || association_name, foreign_key: foreign_key
+          )
+        end
+        @associations[association_name] = {
+          type: :one_to_many, class_name: class_name || association_name, foreign_key: foreign_key
+        }
       end
 
-      def many_to_one(type, class_name: nil, key: nil)
-        define_method(type) do
-          memo = instance_variable_get(:"@#{type}")
+      def many_to_one(association_name, class_name: nil, key: nil)
+        define_method(association_name) do
+          memo = instance_variable_get(:"@#{association_name}")
           memo || begin
-            key ||= :"#{type}_id"
+            key ||= :"#{association_name}_id"
             associated_id = self.send(key)
             return nil unless associated_id
-            klass = Swarm::Support.constantize("#{class_name || type}")
-            instance_variable_set(:"@#{type}", klass.fetch(associated_id, :hive => hive))
+            klass = Swarm::Support.constantize("#{class_name || association_name}")
+            instance_variable_set(:"@#{association_name}", klass.fetch(associated_id, :hive => hive))
           end
         end
-        @associations << type
+        @associations[association_name] = {
+          type: :many_to_one, class_name: class_name || association_name, key: key
+        }
       end
 
       def create(hive: Hive.default, **args)

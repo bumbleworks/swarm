@@ -20,7 +20,7 @@ module Swarm
       node = tree[at_position]
       raise InvalidPositionError unless node
       expression = create_child_expression(node: node, at_position: at_position)
-      (self.children_ids ||= []) << expression.id
+      add_to_children(expression)
       expression
     end
 

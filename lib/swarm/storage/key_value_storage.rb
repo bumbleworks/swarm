@@ -1,6 +1,8 @@
 module Swarm
   module Storage
     class KeyValueStorage
+      class AssociationKeyMissingError < StandardError; end
+
       attr_reader :store
 
       def initialize(store)
@@ -27,14 +29,26 @@ module Swarm
         raise "Not implemented yet!"
       end
 
-      def load_associations(association_name, owner:, type:, foreign_key: nil)
-        type = type.split("::").last
-        local_association_ids = :"#{association_name}_ids"
-        if owner.respond_to?(local_association_ids)
-          ids = owner.send(local_association_ids) || []
+      def add_association(association_name, associated, owner:, class_name:, foreign_key: nil)
+        key = :"#{association_name}_ids"
+        if owner.respond_to?(key)
+          ids = owner.send(key) || owner.send("#{key}=", [])
+          ids << associated.id
+          associated
+        else
+          raise AssociationKeyMissingError, key
+        end
+      end
+
+      def load_associations(association_name, owner:, class_name:, foreign_key: nil)
+        key = :"#{association_name}_ids"
+        if owner.respond_to?(key)
+          ids = owner.send(key) || []
           ids.map { |id|
-            self["#{type}:#{id}"]
+            self["#{class_name.split("::").last}:#{id}"]
           }.compact
+        else
+          raise AssociationKeyMissingError, key
         end
       end
 

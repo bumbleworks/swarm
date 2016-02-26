@@ -218,6 +218,59 @@ RSpec.describe Swarm::HiveDweller do
     end
   end
 
+  describe ".one_to_many" do
+    let(:association_class) { double }
+
+    before(:each) do
+      allow(subject).to receive(:spam_noodles_ids).and_return("spam_noodles_ids")
+      allow(association_class).to receive(:fetch).
+        with("spam_noodle_id", :hive => hive).and_return(:the_object)
+      allow(hive).to receive(:reify_from_hash).with(:data1).and_return(:noodle1)
+      allow(hive).to receive(:reify_from_hash).with(:data2).and_return(:noodle2)
+    end
+
+    it "adds helper method to retrieve association" do
+      allow(hive.storage).to receive(:add_association).
+        with(:spam_noodles, :a_noodle, owner: subject, class_name: "Noodle", foreign_key: "thing_id").
+        and_return(:the_new_association)
+      test_class.one_to_many :spam_noodles, class_name: "Noodle", foreign_key: "thing_id"
+      expect(subject.add_to_spam_noodles(:a_noodle)).to eq(:the_new_association)
+    end
+
+    it "adds helper method to add association" do
+      allow(hive.storage).to receive(:load_associations).
+        with(:spam_noodles, owner: subject, class_name: :spam_noodles, foreign_key: nil).
+        and_return([:data1, :data2])
+      test_class.one_to_many :spam_noodles
+      expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
+    end
+
+    it "allows for override of association key" do
+      allow(hive.storage).to receive(:load_associations).
+        with(:spam_noodles, owner: subject, class_name: :spam_noodles, foreign_key: "ploo").
+        and_return([:data1, :data2])
+      test_class.one_to_many :spam_noodles, :foreign_key => "ploo"
+      expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
+    end
+
+    it "allows for override of class_name" do
+      allow(hive.storage).to receive(:load_associations).
+        with(:spam_noodles, owner: subject, class_name: "MyUnclesTruck", foreign_key: nil).
+        and_return([:data1, :data2])
+      test_class.one_to_many :spam_noodles, :class_name => "MyUnclesTruck"
+      expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
+    end
+
+    it "memoizes association" do
+      allow(hive.storage).to receive(:load_associations).
+        with(:spam_noodles, owner: subject, class_name: :spam_noodles, foreign_key: nil).
+        and_return([:data1, :data2]).once
+      test_class.one_to_many :spam_noodles
+      expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
+      expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
+    end
+  end
+
   describe ".many_to_one" do
     let(:association_class) { double }
 
