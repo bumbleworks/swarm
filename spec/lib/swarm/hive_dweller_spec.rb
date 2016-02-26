@@ -81,8 +81,9 @@ RSpec.describe Swarm::HiveDweller do
       subject.instance_variable_set(:@id, nil)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("123-345-567")
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:123-345-567", subject.to_hash.merge(:updated_at => Time.now))
+      expect(subject).to receive(:reload!)
       subject.save
-      expect(hive.storage["AluminumHead:123-345-567"]).to eq({ "foo" => "bar", "updated_at" => Time.now.to_s })
     end
 
     it "saves if new" do
@@ -118,30 +119,20 @@ RSpec.describe Swarm::HiveDweller do
         :updated_at => updated_at
       })
     end
-
-    it "restores timestamp attributes after storage" do
-      hive.storage["AluminumHead:1234"] = subject.to_hash
-      expect(subject.reload!.to_hash).to eq({
-        :id => "1234",
-        :type => "Heads::AluminumHead",
-        :horse => "fire",
-        :rabbits => "earth",
-        :created_at => created_at,
-        :updated_at => updated_at
-      })
-    end
   end
 
   describe "#reload!" do
     it "re-retrieves hash from storage and populates columns" do
-      hive.storage["AluminumHead:1234"] = subject.to_hash.merge(:horse => "snoot")
+      allow(hive.storage).to receive(:[]).with("AluminumHead:1234").
+        and_return(subject.to_hash.merge("horse" => "snoot"))
       expect(subject.horse).to eq("fire")
       subject.reload!
       expect(subject.horse).to eq("snoot")
     end
 
     it "resets changed? to false" do
-      hive.storage["AluminumHead:1234"] = subject.to_hash
+      allow(hive.storage).to receive(:[]).with("AluminumHead:1234").
+        and_return(subject.to_hash)
       subject.horse = "snoot"
       expect(subject).to be_changed
       subject.reload!
@@ -160,7 +151,8 @@ RSpec.describe Swarm::HiveDweller do
       test_class.set_columns :puppy_id
       test_class.many_to_one :puppy
 
-      hive.storage["AluminumHead:1234"] = subject.to_hash.merge(:puppy_id => "67890")
+      allow(hive.storage).to receive(:[]).with("AluminumHead:1234").
+        and_return(subject.to_hash.merge("puppy_id" => "67890"))
       subject.puppy_id = "12345"
       expect(subject.puppy).to eq(:the_object)
       subject.reload!
@@ -206,7 +198,8 @@ RSpec.describe Swarm::HiveDweller do
 
   describe ".fetch" do
     it "retrieves hash from storage for given key and reifies" do
-      hive.storage["AluminumHead:1234"] = subject.to_hash
+      allow(hive.storage).to receive(:[]).with("AluminumHead:1234").
+        and_return(subject.to_hash)
       allow(hive).to receive(:reify_from_hash).with(hive.storage["AluminumHead:1234"]).
         and_return(subject)
       expect(test_class.fetch("1234", :hive => hive)).to eq(subject)
