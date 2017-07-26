@@ -151,4 +151,12 @@ RSpec.describe Swarm::Process do
       subject.move_on_from(double(Swarm::Expression, :workitem => "a_new_workitem"))
     end
   end
+
+  describe "#process_definition_name" do
+    it "delegates to process_definition #name" do
+      allow(subject).to receive(:process_definition).
+        and_return(double(:name => "A special process"))
+      expect(subject.process_definition_name).to eq("A special process")
+    end
+  end
 end

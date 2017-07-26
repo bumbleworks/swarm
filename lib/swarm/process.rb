@@ -47,5 +47,9 @@ module Swarm
         parent_expression.move_on_from(self)
       end
     end
+
+    def process_definition_name
+      process_definition.name
+    end
   end
 end
