@@ -1,6 +1,5 @@
 module Swarm
   class Hive
-    class MissingTypeError < StandardError; end
     class IllegalDefaultError < StandardError; end
     class NoDefaultSetError < StandardError; end
 
@@ -56,16 +55,6 @@ module Swarm
 
     def fetch(klass, id)
       Swarm::Support.constantize(klass).fetch(id, hive: self)
-    end
-
-    def reify_from_hash(hsh)
-      Support.symbolize_keys!(hsh)
-      raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
-      Swarm::Support.constantize(hsh.delete(:type)).new_from_storage(
-        hsh.merge(
-          :hive => self
-        )
-      )
     end
   end
 end

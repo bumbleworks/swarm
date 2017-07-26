@@ -50,27 +50,6 @@ RSpec.describe Swarm::Hive do
     end
   end
 
-  describe "#reify_from_hash" do
-    it "constantizes type from hash and instantiates new object" do
-      klass_double = double
-      hash = { "type" => "a_great_type", "other_thing" => "neat_thing" }
-      allow(Swarm::Support).to receive(:constantize).with("a_great_type").
-        and_return(klass_double)
-      expect(klass_double).to receive(:new_from_storage).with({
-        :other_thing => "neat_thing",
-        :hive => subject
-      }).and_return(:the_item)
-      expect(subject.reify_from_hash(hash)).to eq(:the_item)
-    end
-
-    it "raises exception if hash has no type" do
-      bad_hash = { "not_type" => "darn_it_where_is_type" }
-      expect {
-        subject.reify_from_hash(bad_hash)
-      }.to raise_error(described_class::MissingTypeError, { :not_type => "darn_it_where_is_type" }.inspect)
-    end
-  end
-
   describe "#queue" do
     it "adds job to work queue" do
       expect(work_queue).to receive(:add_job).with({

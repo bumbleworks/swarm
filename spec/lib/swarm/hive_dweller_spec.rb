@@ -200,7 +200,7 @@ RSpec.describe Swarm::HiveDweller do
     it "retrieves hash from storage for given key and reifies" do
       allow(hive.storage).to receive(:[]).with("AluminumHead:1234").
         and_return(subject.to_hash)
-      allow(hive).to receive(:reify_from_hash).with(hive.storage["AluminumHead:1234"]).
+      allow(test_class).to receive(:reify_from_hash).with(hive.storage["AluminumHead:1234"], hive: hive).
         and_return(subject)
       expect(test_class.fetch("1234", :hive => hive)).to eq(subject)
     end
@@ -222,11 +222,8 @@ RSpec.describe Swarm::HiveDweller do
     let(:association_class) { double }
 
     before(:each) do
-      allow(subject).to receive(:spam_noodles_ids).and_return("spam_noodles_ids")
-      allow(association_class).to receive(:fetch).
-        with("spam_noodle_id", :hive => hive).and_return(:the_object)
-      allow(hive).to receive(:reify_from_hash).with(:data1).and_return(:noodle1)
-      allow(hive).to receive(:reify_from_hash).with(:data2).and_return(:noodle2)
+      allow(test_class).to receive(:reify_from_hash).with(:data1, hive: hive).and_return(:noodle1)
+      allow(test_class).to receive(:reify_from_hash).with(:data2, hive: hive).and_return(:noodle2)
     end
 
     it "adds helper method to retrieve association" do
@@ -328,12 +325,34 @@ RSpec.describe Swarm::HiveDweller do
     end
   end
 
+  describe ".reify_from_hash" do
+    it "constantizes type from hash and instantiates new object" do
+      klass_double = double
+      hash = { "type" => "a_great_type", "other_thing" => "neat_thing" }
+      allow(Swarm::Support).to receive(:constantize).with("a_great_type").
+        and_return(klass_double)
+      expect(klass_double).to receive(:new_from_storage).with({
+        :other_thing => "neat_thing",
+        :hive => hive
+      }).and_return(:the_item)
+      allow(test_class).to receive(:name).and_return("a_great_type")
+      expect(test_class.reify_from_hash(hash, hive: hive)).to eq(:the_item)
+    end
+
+    it "raises exception if hash has no type" do
+      bad_hash = { "not_type" => "darn_it_where_is_type" }
+      expect {
+        test_class.reify_from_hash(bad_hash, hive: hive)
+      }.to raise_error(described_class::MissingTypeError, { :not_type => "darn_it_where_is_type" }.inspect)
+    end
+  end
+
   describe ".all" do
     it "returns all values for storage type" do
       allow(hive.storage).to receive(:all_of_type).with("AluminumHead", subtypes: true).
         and_return([double(:dup => :first_hash), double(:dup => :second_hash)])
-      allow(hive).to receive(:reify_from_hash).with(:first_hash).and_return(:first_object)
-      allow(hive).to receive(:reify_from_hash).with(:second_hash).and_return(:second_object)
+      allow(test_class).to receive(:reify_from_hash).with(:first_hash, hive: hive).and_return(:first_object)
+      allow(test_class).to receive(:reify_from_hash).with(:second_hash, hive: hive).and_return(:second_object)
       expect(test_class.all(:hive => hive)).to eq([:first_object, :second_object])
     end
   end

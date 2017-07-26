@@ -1,5 +1,6 @@
 module Swarm
   class HiveDweller
+    class MissingTypeError < StandardError; end
     class RecordNotFoundError < StandardError; end
 
     attr_reader :hive, :id
@@ -123,7 +124,7 @@ module Swarm
             associations = hive.storage.load_associations(
               association_name, owner: self, class_name: class_name || association_name, foreign_key: foreign_key
             )
-            entities = associations.map { |association| hive.reify_from_hash(association) }
+            entities = associations.map { |association| self.class.reify_from_hash(association, hive: hive) }
             instance_variable_set(:"@#{association_name}", entities)
           end
         end
@@ -178,7 +179,7 @@ module Swarm
 
       def fetch(key, hive: Hive.default)
         hsh = hive.storage[storage_id_for_key(key)].dup
-        hive.reify_from_hash(hsh)
+        reify_from_hash(hsh, hive: hive)
       end
 
       def ids(hive: Hive.default)
@@ -197,8 +198,18 @@ module Swarm
 
       def all(hive: Hive.default, subtypes: true)
         hive.storage.all_of_type(storage_type, subtypes: subtypes).map { |hsh|
-          hive.reify_from_hash(hsh.dup)
+          reify_from_hash(hsh.dup, hive: hive)
         }
+      end
+
+      def reify_from_hash(hsh, hive: Hive.default)
+        Support.symbolize_keys!(hsh)
+        raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
+        Swarm::Support.constantize(hsh.delete(:type)).new_from_storage(
+          hsh.merge(
+            :hive => hive
+          )
+        )
       end
     end
   end
