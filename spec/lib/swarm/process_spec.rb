@@ -2,6 +2,18 @@ RSpec.describe Swarm::Process do
   let(:params) { { :process_definition_id => '123', :workitem => "the workitem"} }
   subject { described_class.create(params) }
 
+  describe "#workitem_trace" do
+    it "returns existing traced array on workitem" do
+      allow(subject).to receive(:workitem).and_return({ "traced" => [:foo, :bar] })
+      expect(subject.workitem_trace).to eq([:foo, :bar])
+    end
+
+    it "returns empty array if no existing traced array" do
+      allow(subject).to receive(:workitem).and_return({})
+      expect(subject.workitem_trace).to eq([])
+    end
+  end
+
   describe "#wait_until_finished" do
     it "waits until finished" do
       allow(subject).to receive(:finished?).and_return(false, true)

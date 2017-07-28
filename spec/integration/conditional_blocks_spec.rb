@@ -8,8 +8,8 @@ RSpec.describe Swarm::Process, :process => true do
 
     it "only executes blocks where conditional is true" do
       subject
-      wait_until { hive.traced.include?("and that is a fact") }
-      expect(hive.traced).to eq([
+      wait_until { subject.reload!.workitem_trace.include?("and that is a fact") }
+      expect(subject.reload!.workitem_trace).to eq([
         "oh",
         "ha ha",
         "no such thing as ghosts",

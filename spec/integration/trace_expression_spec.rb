@@ -6,7 +6,7 @@ RSpec.describe Swarm::Process, :process => true do
   context "with trace expressions" do
     it "runs and collects traces from expressions" do
       subject.wait_until_finished
-      expect(hive.traced).to eq([
+      expect(subject.reload!.workitem_trace).to eq([
         "first string",
         "second string",
         "third string",

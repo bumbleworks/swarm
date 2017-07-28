@@ -38,14 +38,6 @@ module Swarm
       storage.class.name.split('::').last
     end
 
-    def traced
-      storage.trace ||= []
-    end
-
-    def trace(new_element)
-      storage.trace = traced + [new_element]
-    end
-
     def queue(action, object)
       @work_queue.add_job({
         :action => action,

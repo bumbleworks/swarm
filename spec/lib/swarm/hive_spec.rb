@@ -60,33 +60,6 @@ RSpec.describe Swarm::Hive do
     end
   end
 
-  describe "#traced" do
-    it "returns trace array from storage" do
-      storage.trace = ["pigs", "carbines"]
-      expect(subject.traced).to eq(["pigs", "carbines"])
-    end
-
-    it "initializes trace to empty array if not previously set" do
-      expect(storage.trace).to be_nil
-      expect(subject.traced).to eq([])
-      expect(storage.trace).to eq([])
-    end
-  end
-
-  describe "#trace" do
-    it "adds new element to trace array" do
-      storage.trace = ["pigs", "carbines"]
-      subject.trace("poplars")
-      expect(subject.traced).to eq(["pigs", "carbines", "poplars"])
-    end
-
-    it "initializes trace before adding element if trace empty" do
-      expect(storage.trace).to be_nil
-      subject.trace("hot dogs")
-      expect(storage.trace).to eq(["hot dogs"])
-    end
-  end
-
   describe "#registered_observers" do
     it "defaults to empty array" do
       expect(subject.registered_observers).to eq([])

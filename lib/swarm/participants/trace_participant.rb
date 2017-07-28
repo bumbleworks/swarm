@@ -3,10 +3,7 @@ require_relative "../participant"
 module Swarm
   class TraceParticipant < Participant
     def work
-      if text
-        append_to_workitem_trace
-        append_to_hive_trace
-      end
+      append_to_workitem_trace if text
       expression.reply
     end
 
@@ -18,10 +15,6 @@ module Swarm
       traced = workitem["traced"] || []
       traced << text
       expression.workitem = workitem.merge("traced" => traced)
-    end
-
-    def append_to_hive_trace
-      hive.trace(text)
     end
   end
 end

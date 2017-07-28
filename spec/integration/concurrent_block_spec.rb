@@ -17,14 +17,14 @@ RSpec.describe Swarm::Process, :process => true do
       wait_until { Swarm::StoredWorkitem.count == 2 }
       Swarm::StoredWorkitem.first.proceed
       wait_until_worker_idle
-      expect(hive.traced).to be_empty
+      expect(subject.reload!.workitem_trace).to be_empty
     end
 
     it "proceeds when all children have replied" do
       subject
       wait_until { Swarm::StoredWorkitem.count == 2 }
       Swarm::StoredWorkitem.map(&:proceed)
-      wait_until { hive.traced == ["concurrence done"] }
+      wait_until { subject.reload!.workitem_trace == ["concurrence done"] }
     end
   end
 end

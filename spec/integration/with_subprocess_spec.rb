@@ -7,7 +7,7 @@ RSpec.describe Swarm::Process, :process => true do
     it "runs subprocess inline with main process" do
       Swarm::ProcessDefinition.create_from_pollen(File.read(fixtures_path.join("trace_process.pollen")))
       subject.wait_until_finished
-      expect(subject.reload!.workitem["traced"]).to eq([
+      expect(subject.reload!.workitem_trace).to eq([
         "prologue",
         "first string",
         "second string",

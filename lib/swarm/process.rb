@@ -8,6 +8,10 @@ module Swarm
     many_to_one :root_expression, :class_name => "Swarm::Expression"
     one_to_many :expressions, :class_name => "Swarm::Expression"
 
+    def workitem_trace
+      workitem.fetch("traced", [])
+    end
+
     def wait_until_finished(timeout: 5)
       Swarm::Support.wait_until(timeout: timeout) { finished? }
     end
