@@ -88,7 +88,7 @@ RSpec.describe Swarm::Process do
     it "reloads and returns true if root expression is replied" do
       allow(root_expression).to receive(:replied?).and_return(true)
       expect(subject).to receive(:reload!).ordered
-      allow(subject).to receive(:root_expression).
+      expect(subject).to receive(:root_expression).twice.
         and_return(root_expression).ordered
       expect(subject).to be_finished
     end
