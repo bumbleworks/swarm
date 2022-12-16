@@ -56,7 +56,7 @@ module Swarm
     def save
       if new? || changed?
         @id ||= Swarm::Support.uuid_with_timestamp
-        storage[storage_id] = to_hash.merge(:updated_at => Time.now)
+        storage[storage_id] = to_hash.merge(updated_at: Time.now)
         reload!
       end
       self
@@ -70,8 +70,8 @@ module Swarm
 
     def to_hash
       hsh = {
-        :id => id,
-        :type => self.class.name
+        id: id,
+        type: self.class.name
       }
       hsh.merge(attributes)
     end
@@ -146,7 +146,7 @@ module Swarm
             associated_id = self.send(key)
             return nil unless associated_id
             klass = Swarm::Support.constantize("#{class_name || association_name}")
-            instance_variable_set(:"@#{association_name}", klass.fetch(associated_id, :hive => hive))
+            instance_variable_set(:"@#{association_name}", klass.fetch(associated_id, hive: hive))
           end
         end
         @associations[association_name] = {
@@ -206,9 +206,7 @@ module Swarm
         Support.symbolize_keys!(hsh)
         raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
         Swarm::Support.constantize(hsh.delete(:type)).new_from_storage(
-          hsh.merge(
-            :hive => hive
-          )
+          **hsh.merge(hive: hive)
         )
       end
     end

@@ -48,8 +48,8 @@ module Swarm
 
     def queue(action, object)
       @work_queue.add_job({
-        :action => action,
-        :metadata => object.to_hash
+        action: action,
+        metadata: object.to_hash
       })
     end
 

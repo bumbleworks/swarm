@@ -89,7 +89,7 @@ RSpec.describe Swarm::Engine::Worker do
     it "stops worker and cleans up if job contains special 'stop_worker' command" do
       allow(subject).to receive(:running?).and_return(true)
       allow(command).to receive(:stop?).and_return(true)
-      expect(work_queue).to receive(:remove_worker).with(subject, :stop_job => :a_queued_job).ordered
+      expect(work_queue).to receive(:remove_worker).with(subject, stop_job: :a_queued_job).ordered
       expect(subject).to receive(:stop!).ordered
       subject.work_on(:a_queued_job)
     end

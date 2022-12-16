@@ -1,5 +1,5 @@
 RSpec.describe Swarm::WorkitemContext do
-  subject { described_class.new({ "foo" => "bar", :baz => "luhrmann"}) }
+  subject { described_class.new({ "foo" => "bar", baz: "luhrmann"}) }
 
   describe "#method_missing" do
     it "returns value from workitem if method matches key" do

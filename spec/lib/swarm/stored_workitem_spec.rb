@@ -1,14 +1,14 @@
 RSpec.describe Swarm::StoredWorkitem do
   let(:expression) {
-    Swarm::ActivityExpression.create({
-      :workitem => { "bubbles" => "shiny" },
-      :process_id => "bonkers"
-    })
+    Swarm::ActivityExpression.create(
+      workitem: { "bubbles" => "shiny" },
+      process_id: "bonkers"
+    )
   }
   subject {
-    described_class.create({
-      :expression_id => expression.id
-    })
+    described_class.create(
+      expression_id: expression.id
+    )
   }
 
   before(:each) do

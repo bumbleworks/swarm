@@ -30,7 +30,7 @@ module Swarm
 
     def merge_child_workitem(child)
       self.workitem = Swarm::Support.deep_merge(
-        workitem, child.workitem, :combine_arrays => array_combination_method
+        workitem, child.workitem, combine_arrays: array_combination_method
       )
     end
 

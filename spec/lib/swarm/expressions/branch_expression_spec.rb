@@ -1,12 +1,12 @@
 RSpec.describe Swarm::BranchExpression do
   subject {
-    described_class.new_from_storage({
-      :id => 'foo',
-      :workitem => { 'foo' => 'bar' },
-      :process_id => '123',
-      :parent_id => '456',
-      :position => [3]
-    })
+    described_class.new_from_storage(
+      id: 'foo',
+      workitem: { 'foo' => 'bar' },
+      process_id: '123',
+      parent_id: '456',
+      position: [3]
+    )
   }
 
   describe "#children" do
@@ -16,9 +16,9 @@ RSpec.describe Swarm::BranchExpression do
 
     it "returns array of expressions for each child_id" do
       expressions = 3.times.collect { |id|
-        Swarm::Expression.create(:hive => hive)
+        Swarm::Expression.create(hive: hive)
       }
-      extra = Swarm::Expression.create(:hive => hive)
+      extra = Swarm::Expression.create(hive: hive)
       subject.children_ids = expressions.map(&:id)
       expect(subject.children).to match_array(expressions)
     end
@@ -47,14 +47,14 @@ RSpec.describe Swarm::BranchExpression do
       allow(Swarm::Router).to receive(:expression_class_for_node).
         with(:a_node).
         and_return(Swarm::ActivityExpression)
-      allow(Swarm::ActivityExpression).to receive(:create).with({
-        :hive => hive,
-        :parent_id => "foo",
-        :position => [3, 7],
-        :workitem => { "foo" => "bar" },
-        :process_id => "123"
-      }).and_return(:the_expression)
-      expect(subject.create_child_expression(:node => :a_node, :at_position => 7)).
+      allow(Swarm::ActivityExpression).to receive(:create).with(
+        hive: hive,
+        parent_id: "foo",
+        position: [3, 7],
+        workitem: { "foo" => "bar" },
+        process_id: "123"
+      ).and_return(:the_expression)
+      expect(subject.create_child_expression(node: :a_node, at_position: 7)).
         to eq(:the_expression)
     end
   end
@@ -69,9 +69,9 @@ RSpec.describe Swarm::BranchExpression do
 
     it "creates new expression with given command and adds it to child_ids" do
       subject.children_ids = ["876"]
-      fake_expression = double(:id => "987")
+      fake_expression = double(id: "987")
       allow(subject).to receive(:create_child_expression).
-        with(:node => ["whatever", {}, []], :at_position => 0).
+        with(node: ["whatever", {}, []], at_position: 0).
         and_return(fake_expression)
       subject.add_child(0)
       expect(subject.children_ids).to eq(["876", "987"])

@@ -26,7 +26,7 @@ RSpec.describe Swarm::Observers::Logger do
     it "returns expression representation if object is expression" do
       expression = Swarm::Expression.new(position: [0, 4])
       allow(expression).to receive(:command).and_return("jump")
-      allow(expression).to receive(:arguments).and_return({ :args => :foo })
+      allow(expression).to receive(:arguments).and_return({ args: :foo })
       allow(expression).to receive(:reload!)
       allow(command).to receive(:object).and_return(expression)
       expect(subject.object_string).to eq("[0, 4]: jump {:args=>:foo}")

@@ -5,7 +5,7 @@ module Swarm
     def_delegators :expression, :node, :command, :arguments, :process_id, :workitem
 
     set_columns :expression_id
-    many_to_one :expression, :class_name => "Swarm::Expression"
+    many_to_one :expression, class_name: "Swarm::Expression"
 
     def proceed
       delete

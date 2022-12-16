@@ -1,6 +1,6 @@
 RSpec.describe Swarm::Engine::Volatile::Queue do
   let(:job) { instance_double(Swarm::Engine::Volatile::Job) }
-  subject { described_class.new(:name => "dummy_queue") }
+  subject { described_class.new(name: "dummy_queue") }
 
   after(:each) do
     described_class.instance_variable_set(:@tubes, {})
@@ -17,7 +17,7 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
   describe ".get_tube" do
     it "returns tube from tube list if name already registered" do
       allow(described_class).to receive(:tubes).
-        and_return({ :foo => :the_tube })
+        and_return({ foo: :the_tube })
       expect(described_class.get_tube(:foo)).to eq(:the_tube)
     end
 

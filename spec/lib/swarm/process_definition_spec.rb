@@ -15,7 +15,7 @@ RSpec.describe Swarm::ProcessDefinition do
     it "transforms pollen to JSON and then delegates to .create_from_json" do
       allow(Swarm::Pollen::Reader).to receive(:new).
         with(:some_pollen).
-        and_return(double(:to_json => :a_json_version))
+        and_return(double(to_json: :a_json_version))
       allow(described_class).to receive(:create_from_json).
         with(:a_json_version, hive: "amazing hive").
         and_return(:the_result)
@@ -33,7 +33,7 @@ RSpec.describe Swarm::ProcessDefinition do
       end
 
       it "persists new definition in storage" do
-        retrieved_subject = described_class.fetch(subject.id, :hive => hive)
+        retrieved_subject = described_class.fetch(subject.id, hive: hive)
         expect(retrieved_subject.tree).to eq(parsed_json)
       end
     end
@@ -48,7 +48,7 @@ RSpec.describe Swarm::ProcessDefinition do
       end
 
       it "persists new definition in storage" do
-        retrieved_subject = described_class.fetch(subject.id, :hive => hive)
+        retrieved_subject = described_class.fetch(subject.id, hive: hive)
         expect(retrieved_subject.tree).to eq(parsed_json["definition"])
       end
     end
@@ -56,8 +56,8 @@ RSpec.describe Swarm::ProcessDefinition do
 
   describe ".find_by_name" do
     it "returns the saved process definition with the given name" do
-      one = described_class.create(:name => "one")
-      two = described_class.create(:name => "two")
+      one = described_class.create(name: "one")
+      two = described_class.create(name: "two")
       expect(described_class.find_by_name("one")).to eq(one)
       expect(described_class.find_by_name("two")).to eq(two)
     end
@@ -81,9 +81,9 @@ RSpec.describe Swarm::ProcessDefinition do
   describe "#create_process" do
     it "creates a new process from this definition" do
       allow(Swarm::Process).to receive(:create).with({
-        :process_definition_id => subject.id,
-        :workitem => "the workitem",
-        :arg2 => "arg2"
+        process_definition_id: subject.id,
+        workitem: "the workitem",
+        arg2: "arg2"
       }).and_return(:the_process)
 
       expect(subject.create_process(workitem: "the workitem", arg2: "arg2")).to eq(:the_process)

@@ -5,7 +5,7 @@ RSpec.describe Swarm::Engine::Worker::Command do
 
   describe ".from_job" do
     it "parses action and metadata from queued job and instantiates Worker::Command" do
-      job = double(:to_h => job_arguments)
+      job = double(to_h: job_arguments)
       expect(described_class.from_job(job, hive: hive)).to eq(subject)
     end
   end
@@ -15,7 +15,7 @@ RSpec.describe Swarm::Engine::Worker::Command do
       allow(subject).to receive(:object).and_return(:the_object)
       expect(subject.to_hash).to eq({
         action: "fight",
-        metadata: { :foo => "bar" },
+        metadata: { foo: "bar" },
         object: :the_object
       })
     end

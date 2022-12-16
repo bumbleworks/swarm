@@ -8,6 +8,6 @@ RSpec::Core::RakeTask.new(:spec, :tag) do |t, task_args|
   end
 end
 
-task :default => [:spec]
+task default: [:spec]
 
 Rake::TaskManager.record_task_metadata = true

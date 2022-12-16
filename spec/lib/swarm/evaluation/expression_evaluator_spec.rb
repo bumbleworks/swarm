@@ -1,5 +1,5 @@
 RSpec.describe Swarm::ExpressionEvaluator do
-  let(:expression) { double(:workitem => { "foo" => 1, "bar" => 2 }) }
+  let(:expression) { double(workitem: { "foo" => 1, "bar" => 2 }) }
   subject { described_class.new(expression) }
 
   describe "#eval" do

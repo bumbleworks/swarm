@@ -37,7 +37,7 @@ RSpec.describe Swarm::Hive do
       klass_double = double
       allow(Swarm::Support).to receive(:constantize).with("Heads::AluminumHead").
         and_return(klass_double)
-      expect(klass_double).to receive(:fetch).with("1234", :hive => hive).and_return(:the_item)
+      expect(klass_double).to receive(:fetch).with("1234", hive: hive).and_return(:the_item)
       expect(subject.fetch("Heads::AluminumHead", "1234")).to eq(:the_item)
     end
   end
@@ -53,10 +53,10 @@ RSpec.describe Swarm::Hive do
   describe "#queue" do
     it "adds job to work queue" do
       expect(work_queue).to receive(:add_job).with({
-        :action => "do_something_to",
-        :metadata => "my_favorite_thing"
+        action: "do_something_to",
+        metadata: "my_favorite_thing"
       })
-      subject.queue("do_something_to", double(:to_hash => "my_favorite_thing"))
+      subject.queue("do_something_to", double(to_hash: "my_favorite_thing"))
     end
   end
 

@@ -1,7 +1,7 @@
-RSpec.describe Swarm::Process, :process => true do
+RSpec.describe Swarm::Process, process: true do
   let(:pollen) { File.read(fixtures_path.join('with_subprocess_process.pollen')) }
   let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
-  subject { definition.launch_process(:workitem => {}) }
+  subject { definition.launch_process(workitem: {}) }
 
   context "with subprocess expression" do
     it "runs subprocess inline with main process" do

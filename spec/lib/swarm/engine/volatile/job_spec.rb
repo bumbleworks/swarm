@@ -19,7 +19,7 @@ RSpec.describe Swarm::Engine::Volatile::Job do
 
   describe "#==" do
     it "returns false if other is not a job" do
-      other = double("SomethingElse", :id => subject.id)
+      other = double("SomethingElse", id: subject.id)
       expect(subject).not_to eq(other)
     end
 

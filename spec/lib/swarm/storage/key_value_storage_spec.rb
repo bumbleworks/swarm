@@ -12,7 +12,7 @@ RSpec.describe Swarm::Storage::KeyValueStorage do
 
   describe "#serialize" do
     it "returns jsonified value" do
-      value = double(:to_json => "scuba_gear")
+      value = double(to_json: "scuba_gear")
       expect(subject.serialize(value)).to eq("scuba_gear")
     end
 

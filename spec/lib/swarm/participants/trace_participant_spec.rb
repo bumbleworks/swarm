@@ -1,13 +1,13 @@
 RSpec.describe Swarm::TraceParticipant do
   let(:expression) {
-    Swarm::ActivityExpression.new_from_storage({
-      :workitem => {},
-    })
+    Swarm::ActivityExpression.new_from_storage(
+      workitem: {},
+    )
   }
   subject {
-    described_class.new({
-      :expression => expression
-    })
+    described_class.new(
+      expression: expression
+    )
   }
 
   before(:each) do

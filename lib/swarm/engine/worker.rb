@@ -62,7 +62,7 @@ module Swarm
         raise NotRunningError unless running?
         command = Command.from_job(queue_job, hive: hive)
         if command.stop?
-          queue.remove_worker(self, :stop_job => queue_job)
+          queue.remove_worker(self, stop_job: queue_job)
           stop!
         else
           command.run!

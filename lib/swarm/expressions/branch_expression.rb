@@ -27,11 +27,11 @@ module Swarm
     def create_child_expression(node:, at_position:)
       klass = Router.expression_class_for_node(node)
       expression = klass.create(
-        :hive => hive,
-        :parent_id => id,
-        :position => position + [at_position],
-        :workitem => workitem,
-        :process_id => process_id
+        hive: hive,
+        parent_id: id,
+        position: position + [at_position],
+        workitem: workitem,
+        process_id: process_id
       )
     end
   end

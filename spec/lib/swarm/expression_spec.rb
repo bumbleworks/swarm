@@ -1,10 +1,16 @@
 RSpec.describe Swarm::Expression do
-  subject { described_class.new(:hive => hive, :process_id => '123', :parent_id => '456') }
+  subject {
+    described_class.new(
+      hive: hive,
+      process_id: '123',
+      parent_id: '456'
+    )
+  }
 
   describe "#process" do
     it "returns process for this expression" do
       allow(Swarm::Process).to receive(:fetch).
-        with('123', :hive => hive).
+        with('123', hive: hive).
         and_return(:the_process)
       expect(subject.process).to eq(:the_process)
     end
@@ -54,7 +60,7 @@ RSpec.describe Swarm::Expression do
 
     it "returns parent expression if not root" do
       allow(Swarm::Expression).to receive(:fetch).
-        with('456', :hive => hive).
+        with('456', hive: hive).
         and_return(:the_parent_expression)
       expect(subject.parent).to eq(:the_parent_expression)
     end
@@ -172,7 +178,7 @@ RSpec.describe Swarm::Expression do
   end
 
   context "node part accessors" do
-    let(:node) { ["a_command", { :args => :foo }, [:fake, :tree]] }
+    let(:node) { ["a_command", { args: :foo }, [:fake, :tree]] }
     before(:each) do
       allow(subject).to receive(:node).and_return(node)
     end
@@ -185,7 +191,7 @@ RSpec.describe Swarm::Expression do
 
     describe "#arguments" do
       it "returns second element from node" do
-        expect(subject.arguments).to eq({ :args => :foo })
+        expect(subject.arguments).to eq({ args: :foo })
       end
     end
 

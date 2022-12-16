@@ -8,7 +8,7 @@ module Swarm
 
     def method_missing(method, *args)
       if workitem.has_key?(method)
-        workitem.fetch(method, nil)
+        workitem.fetch(method)
       else
         super
       end

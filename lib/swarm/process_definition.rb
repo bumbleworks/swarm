@@ -5,11 +5,11 @@ module Swarm
     class NotYetPersistedError < StandardError; end
 
     set_columns :tree, :name, :version
-    one_to_many :processes, :class_name => "Swarm::Process"
+    one_to_many :processes, class_name: "Swarm::Process"
 
     class << self
       def create_from_json(json, hive: Hive.default)
-        create(**parse_json_definition(json).merge(:hive => hive))
+        create(**parse_json_definition(json).merge(hive: hive))
       end
 
       def create_from_pollen(pollen, hive: Hive.default)
@@ -20,12 +20,12 @@ module Swarm
       def parse_json_definition(json)
         parsed = JSON.parse(json)
         if parsed.is_a?(Array)
-          { :tree => parsed }
+          { tree: parsed }
         else
           {
-            :name => parsed["name"],
-            :version => parsed["version"],
-            :tree => parsed["definition"]
+            name: parsed["name"],
+            version: parsed["version"],
+            tree: parsed["definition"]
           }
         end
       end
@@ -38,9 +38,9 @@ module Swarm
     def create_process(workitem:, **args)
       raise NotYetPersistedError unless id
       Process.create(
-        args.merge({
-          :workitem => workitem,
-          :process_definition_id => id
+        **args.merge({
+          workitem: workitem,
+          process_definition_id: id
         })
       )
     end
