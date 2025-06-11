@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "swarm/observers/logger"
 
 RSpec.describe Swarm::Observers::Logger do
@@ -79,7 +81,8 @@ RSpec.describe Swarm::Observers::Logger do
 
   describe "#after_action" do
     around(:each) do |example|
-      previous, $stdout = $stdout, StringIO.new
+      previous = $stdout
+      $stdout = StringIO.new
       example.run
       $stdout = previous
     end

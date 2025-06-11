@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::SubprocessExpression do
   subject {
     described_class.new_from_storage(
@@ -9,7 +11,7 @@ RSpec.describe Swarm::SubprocessExpression do
   }
 
   before(:each) do
-    allow(subject).to receive(:node).and_return(["subprocess", {"name" => "some_process"}, []])
+    allow(subject).to receive(:node).and_return(["subprocess", { "name" => "some_process" }, []])
   end
 
   describe "#work" do

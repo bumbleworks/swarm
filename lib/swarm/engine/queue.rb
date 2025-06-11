@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "job"
 
 module Swarm
@@ -12,15 +14,15 @@ module Swarm
         @name = name
       end
 
-      def prepare_for_work(worker)
+      def prepare_for_work(_worker)
         raise "Not implemented yet!"
       end
 
-      def add_job(data)
+      def add_job(_data)
         raise "Not implemented yet!"
       end
 
-      def reserve_job(worker)
+      def reserve_job(_worker)
         raise "Not implemented yet!"
       end
 
@@ -36,7 +38,7 @@ module Swarm
         job.bury if job.exists? && job.reserved?
       end
 
-      def remove_worker(worker, stop_job:)
+      def remove_worker(_worker, stop_job:)
         if worker_count <= 1
           stop_job.delete
         else

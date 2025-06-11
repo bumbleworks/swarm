@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 
 module Swarm
@@ -37,6 +39,7 @@ module Swarm
 
     def create_process(workitem:, **args)
       raise NotYetPersistedError unless id
+
       Process.create(
         **args.merge({
           workitem: workitem,

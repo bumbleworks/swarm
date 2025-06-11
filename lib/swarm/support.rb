@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require "securerandom"
 
 module Swarm
   module Support
     class << self
       def deep_merge(hsh1, hsh2, combine_arrays: :override)
-        hsh1.merge(hsh2) { |key, v1, v2|
+        hsh1.merge(hsh2) { |_key, v1, v2|
           if [v1, v2].all? { |v| v.is_a?(Array) }
             combine_arrays(v1, v2, method: combine_arrays)
           elsif [v1, v2].all? { |v| v.is_a?(Hash) }
@@ -45,15 +47,18 @@ module Swarm
 
       def tokenize(string)
         return nil if string.nil?
-        string = string.to_s.gsub(/&/, ' and ').
-          gsub(/[ \/]+/, '_').
-          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+
+        string.to_s.gsub(/&/, ' and ').
+          gsub(%r{[ /]+}, '_').
+          gsub(/([a-z\d])([A-Z])/, '\1_\2').
           downcase
       end
 
       def camelize(string)
-        string = string.sub(/^[a-z\d]*/) { $&.capitalize }
-        string = string.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
+        string = string.sub(/^[a-z\d]*/) { ::Regexp.last_match(0).capitalize }
+        string.gsub(%r{(?:_|(/))([a-z\d]*)}) {
+          "#{::Regexp.last_match(1)}#{::Regexp.last_match(2).capitalize}"
+        }.gsub('/', '::')
       end
 
       def constantize(string)
@@ -70,17 +75,9 @@ module Swarm
         constant
       end
 
-      def slice(hash, *keys)
-        {}.tap { |h|
-          keys.each { |k|
-            h[k] = hash[k] if hash.has_key?(k)
-          }
-        }
-      end
-
       def wait_until(timeout: 5, initial_delay: nil)
         sleep(initial_delay) if initial_delay.is_a?(Numeric)
-        Timeout::timeout(timeout) do
+        Timeout.timeout(timeout) do
           sleep 0.05 until yield
         end
       end

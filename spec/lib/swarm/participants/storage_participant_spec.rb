@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::StorageParticipant do
   let(:expression) {
     Swarm::ActivityExpression.new_from_storage(
@@ -13,7 +15,7 @@ RSpec.describe Swarm::StorageParticipant do
   }
 
   before(:each) do
-    allow(expression).to receive(:node).and_return(["badabingle", {"some words" => nil}, []])
+    allow(expression).to receive(:node).and_return(["badabingle", { "some words" => nil }, []])
   end
 
   describe "#work" do

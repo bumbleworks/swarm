@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   module Engine
     class Worker
@@ -14,7 +16,7 @@ module Swarm
 
         attr_reader :action, :metadata, :hive
 
-        def initialize(hive: Hive.default, action:, metadata:)
+        def initialize(action:, metadata:, hive: Hive.default)
           @hive = hive
           @action = action
           @metadata = Swarm::Support.symbolize_keys(metadata || {})
@@ -22,6 +24,7 @@ module Swarm
 
         def run!
           raise MissingObjectError if object.nil?
+
           observers.each(&:before_action)
           object.send("_#{action}")
           observers.each(&:after_action)
@@ -36,6 +39,7 @@ module Swarm
         def object
           @object ||= begin
             return nil unless metadata[:type] && metadata[:id]
+
             hive.fetch(metadata[:type], metadata[:id])
           end
         end

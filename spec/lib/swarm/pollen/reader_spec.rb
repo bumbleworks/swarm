@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Pollen::Reader do
   let(:pollen) { File.read(fixture_path("#{process_type}.pollen")) }
   let(:json) { File.read(fixture_path("#{process_type}.json")) }

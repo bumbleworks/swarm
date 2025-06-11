@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Process do
-  let(:params) { { process_definition_id: '123', workitem: "the workitem"} }
+  let(:params) { { process_definition_id: '123', workitem: "the workitem" } }
   subject { described_class.create(**params) }
 
   describe "#wait_until_finished" do

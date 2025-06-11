@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Worker do
   subject { described_class.new }
   let(:command) { described_class::Command.new(action: "spew", metadata: {}, hive: hive) }
 
-  before(:each) {
+  before(:each) do
     allow(work_queue).to receive(:prepare_for_work).with(subject).and_return(work_queue)
     allow(described_class::Command).to receive(:from_job).
       with(:a_queued_job, hive: hive).
       and_return(command)
-  }
+  end
 
   describe "#working?" do
     it "returns true if working variable true" do

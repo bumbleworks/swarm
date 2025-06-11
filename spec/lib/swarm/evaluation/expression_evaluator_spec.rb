@@ -1,24 +1,35 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ExpressionEvaluator do
   let(:expression) { double(workitem: { "foo" => 1, "bar" => 2 }) }
   subject { described_class.new(expression) }
 
-  describe "#eval" do
+  describe "#evaluate_condition" do
     it "evaluates string in context of workitem" do
-      context = double(Swarm::WorkitemContext)
-      allow(Swarm::WorkitemContext).to receive(:new).
-        with(subject.workitem).
-        and_return(context)
-      allow(context).to receive(:instance_eval).
-        with("a string").
-        and_return("an evaluated string")
-      expect(subject.eval("a string")).to eq("an evaluated string")
+      expect(subject.evaluate_condition("(1 + foo) * bar")).to eq(4)
+    end
+
+    it "raises exception if evaluation fails" do
+      expect {
+        subject.evaluate_condition("1 + baz")
+      }.to raise_error(described_class::UndefinedExpressionVariableError)
+    end
+
+    it "raises exception if expression is not a string" do
+      expect {
+        subject.evaluate_condition("4 *")
+      }.to raise_error(described_class::InvalidExpressionError)
     end
   end
 
   describe "#check_condition" do
     before(:each) do
-      allow(subject).to receive(:eval).with("it is true").and_return(true)
-      allow(subject).to receive(:eval).with("it is false").and_return(false)
+      allow(subject).to receive(:evaluate_condition).
+        with("it is true").
+        and_return(true)
+      allow(subject).to receive(:evaluate_condition).
+        with("it is false").
+        and_return(false)
     end
 
     it "returns true if 'if' expression evaluates to true" do
@@ -51,14 +62,14 @@ RSpec.describe Swarm::ExpressionEvaluator do
     end
 
     it "returns true if all conditional arguments meet expectations" do
-      allow(subject).to receive(:eval).with("yay == 1").and_return(true)
-      allow(subject).to receive(:eval).with("boo == 2").and_return(false)
+      allow(subject).to receive(:evaluate_condition).with("yay == 1").and_return(true)
+      allow(subject).to receive(:evaluate_condition).with("boo == 2").and_return(false)
       expect(subject.all_conditions_met?).to eq(true)
     end
 
     it "returns false if any conditional arguments don't meet expectations" do
-      allow(subject).to receive(:eval).with("yay == 1").and_return(true)
-      allow(subject).to receive(:eval).with("boo == 2").and_return(true)
+      allow(subject).to receive(:evaluate_condition).with("yay == 1").and_return(true)
+      allow(subject).to receive(:evaluate_condition).with("boo == 2").and_return(true)
       expect(subject.all_conditions_met?).to eq(false)
     end
   end

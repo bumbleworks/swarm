@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Process, process: true do
   let(:pollen) { File.read(fixture_path) }
   let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }
@@ -8,13 +10,13 @@ RSpec.describe Swarm::Process, process: true do
 
     it "calls all children concurrently" do
       subject
-      wait_until { Swarm::StoredWorkitem.count == 2 }
-      expect(Swarm::StoredWorkitem.map(&:command)).to eq(["defer", "defer"])
+      wait_until do Swarm::StoredWorkitem.count == 2 end
+      expect(Swarm::StoredWorkitem.map(&:command)).to eq(%w[defer defer])
     end
 
     it "does not proceed if not all children have replied" do
       subject
-      wait_until { Swarm::StoredWorkitem.count == 2 }
+      wait_until do Swarm::StoredWorkitem.count == 2 end
       Swarm::StoredWorkitem.first.proceed
       wait_until_worker_idle
       expect(hive.traced).to be_empty
@@ -22,7 +24,7 @@ RSpec.describe Swarm::Process, process: true do
 
     it "proceeds when all children have replied" do
       subject
-      wait_until { Swarm::StoredWorkitem.count == 2 }
+      wait_until do Swarm::StoredWorkitem.count == 2 end
       Swarm::StoredWorkitem.map(&:proceed)
       wait_until { hive.traced == ["concurrence done"] }
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "key_value_storage"
 
 module Swarm

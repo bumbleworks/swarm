@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Storage::RedisStorage do
   let(:redis_db) { double(Redis) }
   let(:data) {
@@ -22,7 +24,7 @@ RSpec.describe Swarm::Storage::RedisStorage do
   describe "#ids_for_type" do
     it "returns all ids for given type" do
       allow(redis_db).to receive(:keys).with("foo:*").and_return(data.keys)
-      expect(subject.ids_for_type("foo")).to eq(["1", "2"])
+      expect(subject.ids_for_type("foo")).to eq(%w[1 2])
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ProcessDefinition do
   let(:json) { File.read(fixtures_path.join('concurrence_process.json')) }
   let(:parsed_json) { JSON.parse(json) }

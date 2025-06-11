@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ConditionalExpression do
   let(:branches) { { "true" => [:a], "false" => [:b] } }
 

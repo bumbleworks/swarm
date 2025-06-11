@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "branch_expression"
 
 module Swarm
@@ -9,7 +11,7 @@ module Swarm
     def move_on_from(child)
       self.workitem = child.workitem
       kick_off_children([child.branch_position + 1])
-    rescue InvalidPositionError => e
+    rescue InvalidPositionError
       reply
     end
   end

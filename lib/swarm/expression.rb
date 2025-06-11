@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "evaluation/expression_evaluator"
 
 module Swarm
@@ -9,7 +11,7 @@ module Swarm
 
       def inherited(subclass)
         super
-        subclass.set_columns *columns
+        subclass.set_columns(*columns)
       end
     end
 
@@ -96,7 +98,7 @@ module Swarm
       tree[position]
     end
 
-  private
+    private
 
     def set_milestone(name, at: Time.now.to_i)
       self.milestones = (milestones || {}).merge(name => at)

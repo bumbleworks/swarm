@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Volatile::Job do
   let(:queue) { Swarm::Engine::Volatile::Queue.new(name: "a queue") }
   let(:data) { { "foo" => "bar" } }
@@ -109,12 +111,12 @@ RSpec.describe Swarm::Engine::Volatile::Job do
 
   describe "#exists?" do
     it "returns true if queue has self in job list" do
-      allow(queue).to receive(:has_job?).with(subject).and_return(true)
+      allow(queue).to receive(:job_exists?).with(subject).and_return(true)
       expect(subject.exists?).to eq(true)
     end
 
     it "returns false if queue does not have self in job list" do
-      allow(queue).to receive(:has_job?).with(subject).and_return(false)
+      allow(queue).to receive(:job_exists?).with(subject).and_return(false)
       expect(subject.exists?).to eq(false)
     end
   end

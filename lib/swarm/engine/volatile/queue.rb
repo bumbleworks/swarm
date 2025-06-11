@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "job"
 
 module Swarm
@@ -22,7 +24,7 @@ module Swarm
         end
 
         def initialize(name:)
-          @name = name
+          super
           @tube = self.class.get_tube(name)
         end
 
@@ -47,8 +49,9 @@ module Swarm
 
         def reserve_job(worker)
           wait_for_job
-          index = jobs.index { |job| job.available? }
+          index = jobs.index(&:available?)
           raise JobNotFoundError unless index
+
           job = jobs[index]
           job.reserve!(worker)
           job
@@ -60,7 +63,7 @@ module Swarm
           jobs.delete_if { |job| job == job_to_delete }
         end
 
-        def has_job?(job_to_find)
+        def job_exists?(job_to_find)
           jobs.any? { |job| job == job_to_find }
         end
 

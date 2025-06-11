@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Swarm
   class Participant
     attr_reader :hive, :expression
 
-    def initialize(hive: Hive.default, expression:)
+    def initialize(expression:, hive: Hive.default)
       @hive = hive
       @expression = expression
     end

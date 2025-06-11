@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
+require "forwardable"
 require "swarm/version"
 require "swarm/support"
-require "swarm/engine/base/queue"
+require "swarm/engine/queue"
 require "swarm/engine/volatile/queue"
 require "swarm/engine/worker"
 require "swarm/hive"
@@ -18,7 +21,6 @@ require "swarm/participants/trace_participant"
 require "swarm/participants/storage_participant"
 require "swarm/pollen/reader"
 require "swarm/storage"
-
 
 module Swarm
   # Your code goes here...

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::HiveDweller do
   let(:test_class) {
     Class.new(described_class).tap { |klass|
@@ -94,7 +96,8 @@ RSpec.describe Swarm::HiveDweller do
       subject.instance_variable_set(:@id, nil)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("123-345-567")
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:123-345-567", subject.to_hash.merge(updated_at: Time.now))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:123-345-567",
+                                                 subject.to_hash.merge(updated_at: Time.now))
       expect(subject).to receive(:reload!)
       subject.save
     end
@@ -103,7 +106,8 @@ RSpec.describe Swarm::HiveDweller do
       new_object = test_class.new(hive: hive)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("9999")
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999", new_object.to_hash.merge(id: "9999", updated_at: Time.now))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999",
+                                                 new_object.to_hash.merge(id: "9999", updated_at: Time.now))
       expect(new_object).to receive(:reload!)
       new_object.save
     end
@@ -194,7 +198,8 @@ RSpec.describe Swarm::HiveDweller do
 
   describe ".new_from_storage" do
     it "returns a new instance with id set" do
-      instance = test_class.new_from_storage(hive: hive, id: "1234", horse: "fire", rabbits: "earth", created_at: created_at)
+      instance = test_class.new_from_storage(hive: hive, id: "1234", horse: "fire", rabbits: "earth",
+                                             created_at: created_at)
       expect(instance.attributes).to eq(horse: "fire", rabbits: "earth", created_at: created_at, updated_at: nil)
       expect(instance.id).to eq("1234")
     end
@@ -373,31 +378,31 @@ RSpec.describe Swarm::HiveDweller do
   describe ".each" do
     it "yields an instance for every id returned by .ids, if is_a? class" do
       allow(test_class).to receive(:ids).with(hive: hive).
-        and_return(["123", "456", "789", "boo"])
-      doubles = ["123", "456", "789"].map do |id|
+        and_return(%w[123 456 789 boo])
+      doubles = %w[123 456 789].map { |id|
         instance_double(test_class).tap { |double|
           allow(double).to receive(:is_a?).with(test_class).and_return(true)
           allow(test_class).to receive(:fetch).with(id, hive: hive).and_return(double)
         }
-      end
-      allow(test_class).to receive(:fetch).with("boo", hive: hive).and_return(double(:is_a? => false))
+      }
+      allow(test_class).to receive(:fetch).with("boo", hive: hive).and_return(double(is_a?: false))
       aggregation = []
-      test_class.each(hive: hive) { |instance| aggregation << instance }
+      test_class.each(hive: hive) do |instance| aggregation << instance end
       expect(aggregation).to eq(doubles)
     end
 
     it "restricts to instances of class specifically if subtypes false" do
       allow(test_class).to receive(:ids).with(hive: hive).
-        and_return(["123", "456", "789", "boo"])
-      doubles = ["123", "456", "789"].map do |id|
-        instance_double(test_class, class: test_class).tap { |double|
-          allow(test_class).to receive(:fetch).with(id, hive: hive).and_return(double)
+        and_return(%w[123 456 789 boo])
+      doubles = %w[123 456 789].map { |id|
+        test_class.new.tap { |instance|
+          allow(test_class).to receive(:fetch).with(id, hive: hive).and_return(instance)
         }
-      end
-      sub_double = double(class: "Nope", :is_a? => true)
+      }
+      sub_double = double(class: "Nope", is_a?: true)
       allow(test_class).to receive(:fetch).with("boo", hive: hive).and_return(sub_double)
       aggregation = []
-      test_class.each(hive: hive, subtypes: false) { |instance| aggregation << instance }
+      test_class.each(hive: hive, subtypes: false) do |instance| aggregation << instance end
       expect(aggregation).to eq(doubles)
     end
   end

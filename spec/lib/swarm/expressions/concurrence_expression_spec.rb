@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ConcurrenceExpression do
   let(:node) { ["concurrence", {}, [:a, :b]] }
   subject {
@@ -57,7 +59,7 @@ RSpec.describe Swarm::ConcurrenceExpression do
       allow(subject).to receive(:children).and_return([
         child1 = double(replied_at: Time.now),
         child2 = double(replied_at: Time.now),
-        child3 = double(replied_at: nil)
+        double(replied_at: nil)
       ])
       expect(subject.replied_children).to match_array([child1, child2])
     end
@@ -116,9 +118,9 @@ RSpec.describe Swarm::ConcurrenceExpression do
     end
 
     it "returns method from args" do
-      allow(subject).to receive(:arguments).and_return({"combine_arrays" => "override"})
+      allow(subject).to receive(:arguments).and_return({ "combine_arrays" => "override" })
       expect(subject.array_combination_method).to eq("override")
-      allow(subject).to receive(:arguments).and_return({"combine_arrays" => "concat"})
+      allow(subject).to receive(:arguments).and_return({ "combine_arrays" => "concat" })
       expect(subject.array_combination_method).to eq("concat")
     end
   end

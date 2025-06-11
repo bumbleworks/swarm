@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::TraceParticipant do
   let(:expression) {
     Swarm::ActivityExpression.new_from_storage(
-      workitem: {},
+      workitem: {}
     )
   }
   subject {
@@ -11,7 +13,7 @@ RSpec.describe Swarm::TraceParticipant do
   }
 
   before(:each) do
-    allow(expression).to receive(:node).and_return(["trace", {"text" => "some words"}, []])
+    allow(expression).to receive(:node).and_return(["trace", { "text" => "some words" }, []])
   end
 
   describe "#work" do

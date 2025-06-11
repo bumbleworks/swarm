@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   module Engine
     module Volatile
@@ -5,6 +7,7 @@ module Swarm
         attr_reader :queue, :data, :id, :reserved_by, :buried
 
         def initialize(queue:, data:)
+          super()
           @queue = queue
           @data = data
           @id = SecureRandom.uuid
@@ -25,6 +28,7 @@ module Swarm
           if reserved_by && reserved_by != worker
             raise AlreadyReservedError
           end
+
           @reserved_by = worker
         end
 
@@ -49,7 +53,7 @@ module Swarm
         end
 
         def exists?
-          queue.has_job?(self)
+          queue.job_exists?(self)
         end
       end
     end

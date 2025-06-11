@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Worker::Command do
   let(:metadata) { { "foo" => "bar" } }
   let(:job_arguments) { { action: "fight", metadata: metadata } }
@@ -30,7 +32,8 @@ RSpec.describe Swarm::Engine::Worker::Command do
     end
 
     it "calls observer callbacks before and after" do
-      foo_observer, bar_observer = double, double
+      foo_observer = double
+      bar_observer = double
       hive_dweller = double
       allow(subject).to receive(:object).and_return(hive_dweller)
       allow(subject).to receive(:observers).and_return([foo_observer, bar_observer])

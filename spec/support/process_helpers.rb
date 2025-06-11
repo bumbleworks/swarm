@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessHelpers
   def storage
     @storage ||= hive.storage

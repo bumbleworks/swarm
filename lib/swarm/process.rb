@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "timeout"
 
 module Swarm
@@ -32,20 +34,21 @@ module Swarm
 
     def finished?
       reload!
-      root_expression && root_expression.replied?
+      root_expression&.replied?
     end
 
     def node_at_position(position)
       raise ArgumentError unless position == 0
+
       process_definition.tree
     end
 
     def move_on_from(expression)
       self.workitem = expression.workitem
       save
-      if parent_expression
-        parent_expression.move_on_from(self)
-      end
+      return unless parent_expression
+
+      parent_expression.move_on_from(self)
     end
 
     def process_definition_name

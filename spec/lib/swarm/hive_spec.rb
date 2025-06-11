@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Hive do
   subject { hive }
 
@@ -62,8 +64,8 @@ RSpec.describe Swarm::Hive do
 
   describe "#traced" do
     it "returns trace array from storage" do
-      storage.trace = ["pigs", "carbines"]
-      expect(subject.traced).to eq(["pigs", "carbines"])
+      storage.trace = %w[pigs carbines]
+      expect(subject.traced).to eq(%w[pigs carbines])
     end
 
     it "initializes trace to empty array if not previously set" do
@@ -75,9 +77,9 @@ RSpec.describe Swarm::Hive do
 
   describe "#trace" do
     it "adds new element to trace array" do
-      storage.trace = ["pigs", "carbines"]
+      storage.trace = %w[pigs carbines]
       subject.trace("poplars")
-      expect(subject.traced).to eq(["pigs", "carbines", "poplars"])
+      expect(subject.traced).to eq(%w[pigs carbines poplars])
     end
 
     it "initializes trace before adding element if trace empty" do
@@ -95,7 +97,7 @@ RSpec.describe Swarm::Hive do
     it "can be appended to" do
       subject.registered_observers << "hats"
       subject.registered_observers << "bumpers"
-      expect(subject.registered_observers).to eq(["hats", "bumpers"])
+      expect(subject.registered_observers).to eq(%w[hats bumpers])
     end
   end
 end

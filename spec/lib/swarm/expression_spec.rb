@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Expression do
   subject {
     described_class.new(
@@ -133,8 +135,8 @@ RSpec.describe Swarm::Expression do
 
   describe "#replied_at" do
     it "returns time from replied_at milestone" do
-      subject.milestones = { "replied_at" => 123456789 }
-      expect(subject.replied_at).to eq(123456789)
+      subject.milestones = { "replied_at" => 123_456_789 }
+      expect(subject.replied_at).to eq(123_456_789)
     end
   end
 
@@ -150,12 +152,12 @@ RSpec.describe Swarm::Expression do
     end
 
     it "returns true if replied_at not nil" do
-      subject.milestones = { "replied_at" => 123456789 }
+      subject.milestones = { "replied_at" => 123_456_789 }
       expect(subject.replied?).to eq(true)
     end
 
     it "returns false if replied_at nil" do
-      subject.milestones = { "replied_at" => nil}
+      subject.milestones = { "replied_at" => nil }
       expect(subject.replied?).to eq(false)
     end
 

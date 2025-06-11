@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::BranchExpression do
   subject {
     described_class.new_from_storage(
@@ -15,10 +17,10 @@ RSpec.describe Swarm::BranchExpression do
     end
 
     it "returns array of expressions for each child_id" do
-      expressions = 3.times.collect { |id|
+      expressions = 3.times.collect { |_id|
         Swarm::Expression.create(hive: hive)
       }
-      extra = Swarm::Expression.create(hive: hive)
+      Swarm::Expression.create(hive: hive)
       subject.children_ids = expressions.map(&:id)
       expect(subject.children).to match_array(expressions)
     end
@@ -74,7 +76,7 @@ RSpec.describe Swarm::BranchExpression do
         with(node: ["whatever", {}, []], at_position: 0).
         and_return(fake_expression)
       subject.add_child(0)
-      expect(subject.children_ids).to eq(["876", "987"])
+      expect(subject.children_ids).to eq(%w[876 987])
     end
 
     it "raises exception if position doesn't exist in tree" do

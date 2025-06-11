@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Process, process: true do
   let(:pollen) { File.read(fixtures_path.join('trace_process.pollen')) }
   let(:definition) { Swarm::ProcessDefinition.create_from_pollen(pollen) }

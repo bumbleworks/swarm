@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Support do
   describe ".deep_merge" do
     let(:h1) { { foo: :bar, baz: [1, 2, 3], crayons: { brand: :crayola, smell: :yucky } } }
@@ -35,10 +37,10 @@ RSpec.describe Swarm::Support do
 
   describe ".symbolize_keys" do
     it "returns copy of given hash with symbolized keys" do
-      hsh = { fancy: { "blue" => "green"}, "what" => 42 }
+      hsh = { fancy: { "blue" => "green" }, "what" => 42 }
       new_hsh = described_class.symbolize_keys(hsh)
       expect(new_hsh).to eq({
-        fancy: { "blue" => "green"}, what: 42
+        fancy: { "blue" => "green" }, what: 42
       })
       expect(new_hsh).not_to eq(hsh)
     end
@@ -46,10 +48,10 @@ RSpec.describe Swarm::Support do
 
   describe ".symbolize_keys!" do
     it "symbolizes keys in given hash" do
-      hsh = { fancy: { "blue" => "green"}, "what" => 42 }
+      hsh = { fancy: { "blue" => "green" }, "what" => 42 }
       described_class.symbolize_keys!(hsh)
       expect(hsh).to eq({
-        fancy: { "blue" => "green"}, what: 42
+        fancy: { "blue" => "green" }, what: 42
       })
     end
   end
@@ -91,6 +93,7 @@ RSpec.describe Swarm::Support do
       class Whatever
         Smoothies = 'tasty'
       end
+
       class Boojus
       end
     end

@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "redis"
   spec.add_dependency "parslet"
+  spec.add_dependency "dentaku"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
@@ -28,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "rubocop"
 end

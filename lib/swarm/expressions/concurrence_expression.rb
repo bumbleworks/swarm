@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "branch_expression"
 
 module Swarm
@@ -13,6 +15,7 @@ module Swarm
     def ready_to_proceed?
       required_replies = arguments.fetch("required_replies", nil)
       return all_children_replied? unless required_replies
+
       replied_children.count >= required_replies
     end
 
@@ -23,9 +26,9 @@ module Swarm
     def move_on_from(child)
       merge_child_workitem(child)
       save
-      if all_children_replied?
-        reply
-      end
+      return unless all_children_replied?
+
+      reply
     end
 
     def merge_child_workitem(child)

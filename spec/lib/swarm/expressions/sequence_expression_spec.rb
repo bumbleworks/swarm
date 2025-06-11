@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::SequenceExpression do
   subject {
     described_class.new_from_storage(

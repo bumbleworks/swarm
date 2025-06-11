@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "swarm/observers/base"
 
 RSpec.describe Swarm::Observers::Base do

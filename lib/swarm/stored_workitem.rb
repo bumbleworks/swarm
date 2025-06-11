@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   class StoredWorkitem < HiveDweller
     extend Forwardable
