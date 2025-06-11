@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "base"
 
 module Swarm
@@ -7,6 +9,7 @@ module Swarm
 
       def before_action
         return unless object
+
         @initial_workitem = object.workitem
       end
 
@@ -20,11 +23,12 @@ module Swarm
 
       def object_string
         return "No object" unless object
+
         object.reload!
         string = if object.is_a?(Swarm::Expression)
           "#{object.position}: #{object.command} #{object.arguments}"
         elsif object.is_a?(Swarm::Process)
-          "#{object.process_definition_name}"
+          object.process_definition_name.to_s
         end
         if object.workitem != initial_workitem
           string += "; #{object.workitem}"

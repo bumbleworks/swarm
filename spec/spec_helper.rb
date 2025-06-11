@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'simplecov'
 SimpleCov.start
 
 require "timecop"
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each do |f| require f end
 
 require './lib/swarm'
 
@@ -22,8 +24,8 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     Swarm::Hive.default = Swarm::Hive.new(
-      :storage => Swarm::Storage::HashStorage.new({}),
-      :work_queue => Swarm::Engine::Volatile::Queue.new(:name => "swarm-test-queue")
+      storage: Swarm::Storage::HashStorage.new({}),
+      work_queue: Swarm::Engine::Volatile::Queue.new(name: "swarm-test-queue")
     )
   end
 
@@ -33,14 +35,14 @@ RSpec.configure do |config|
     hive.registered_observers.clear
   end
 
-  config.around(:each, :process => true) do |example|
+  config.around(:each, process: true) do |example|
     hive.work_queue.clear
     worker = Swarm::Engine::Worker.new
     @worker_thread = Thread.new {
       worker.run!
     }
     example.run
-    hive.work_queue.add_job({:action => "stop_worker"})
+    hive.work_queue.add_job({ action: "stop_worker" })
     @worker_thread.join
   end
 end

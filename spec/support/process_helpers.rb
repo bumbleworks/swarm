@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProcessHelpers
   def storage
     @storage ||= hive.storage
@@ -11,8 +13,8 @@ module ProcessHelpers
     @hive ||= Swarm::Hive.default
   end
 
-  def wait_until(*args)
-    Swarm::Support.wait_until(*args, &Proc.new)
+  def wait_until(**args, &block)
+    Swarm::Support.wait_until(**args, &block)
   end
 
   def wait_until_worker_idle

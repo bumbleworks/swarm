@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "evaluation/expression_evaluator"
 
 module Swarm
@@ -9,14 +11,14 @@ module Swarm
 
       def inherited(subclass)
         super
-        subclass.set_columns *columns
+        subclass.set_columns(*columns)
       end
     end
 
     set_columns :parent_id, :position, :workitem, :children_ids, :milestones, :process_id
-    many_to_one :process, :class_name => "Swarm::Process"
-    many_to_one :parent, :class_name => "Swarm::Expression", :key => :parent_id
-    one_to_many :children, :class_name => "Swarm::Expression", :foreign_key => :parent_id
+    many_to_one :process, class_name: "Swarm::Process"
+    many_to_one :parent, class_name: "Swarm::Expression", key: :parent_id
+    one_to_many :children, class_name: "Swarm::Expression", foreign_key: :parent_id
 
     def branch_position
       @branch_position ||= position.last
@@ -96,7 +98,7 @@ module Swarm
       tree[position]
     end
 
-  private
+    private
 
     def set_milestone(name, at: Time.now.to_i)
       self.milestones = (milestones || {}).merge(name => at)

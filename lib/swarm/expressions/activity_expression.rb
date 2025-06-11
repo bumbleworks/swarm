@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   class ActivityExpression < Expression
     def work

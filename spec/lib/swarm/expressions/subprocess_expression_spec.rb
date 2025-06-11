@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::SubprocessExpression do
   subject {
-    described_class.new_from_storage({
-      :id => 'foo',
-      :workitem => { 'foo' => 'bar' },
-      :process_id => '123',
-      :parent_id => '456'
-    })
+    described_class.new_from_storage(
+      id: 'foo',
+      workitem: { 'foo' => 'bar' },
+      process_id: '123',
+      parent_id: '456'
+    )
   }
 
   before(:each) do
-    allow(subject).to receive(:node).and_return(["subprocess", {"name" => "some_process"}, []])
+    allow(subject).to receive(:node).and_return(["subprocess", { "name" => "some_process" }, []])
   end
 
   describe "#work" do
@@ -35,7 +37,7 @@ RSpec.describe Swarm::SubprocessExpression do
 
   describe "#move_on_from" do
     it "sets the workitem to the subprocess's workitem and replies" do
-      process = instance_double(Swarm::Process, :workitem => "a_new_workitem")
+      process = instance_double(Swarm::Process, workitem: "a_new_workitem")
       expect(subject).to receive(:reply)
       subject.move_on_from(process)
       expect(subject.workitem).to eq("a_new_workitem")

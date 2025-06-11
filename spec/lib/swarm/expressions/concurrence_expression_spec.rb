@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ConcurrenceExpression do
   let(:node) { ["concurrence", {}, [:a, :b]] }
   subject {
-    described_class.new_from_storage({
-      :id => 'foo',
-      :workitem => { 'foo' => 'bar' },
-      :process_id => '123',
-      :parent_id => '456'
-    })
+    described_class.new_from_storage(
+      id: 'foo',
+      workitem: { 'foo' => 'bar' },
+      process_id: '123',
+      parent_id: '456'
+    )
   }
 
   before(:each) do
@@ -55,9 +57,9 @@ RSpec.describe Swarm::ConcurrenceExpression do
   describe "#replied_children" do
     it "returns children who have replied" do
       allow(subject).to receive(:children).and_return([
-        child1 = double(:replied_at => Time.now),
-        child2 = double(:replied_at => Time.now),
-        child3 = double(:replied_at => nil)
+        child1 = double(replied_at: Time.now),
+        child2 = double(replied_at: Time.now),
+        double(replied_at: nil)
       ])
       expect(subject.replied_children).to match_array([child1, child2])
     end
@@ -77,14 +79,14 @@ RSpec.describe Swarm::ConcurrenceExpression do
 
   describe "#move_on_from" do
     it "replies if all children have replied" do
-      fake_child = double(:workitem => {})
+      fake_child = double(workitem: {})
       allow(subject).to receive(:all_children_replied?).and_return(true)
       expect(subject).to receive(:reply)
       subject.move_on_from(fake_child)
     end
 
     it "does not reply if still waiting for children" do
-      fake_child = double(:workitem => {})
+      fake_child = double(workitem: {})
       allow(subject).to receive(:all_children_replied?).and_return(false)
       expect(subject).not_to receive(:reply)
       subject.move_on_from(fake_child)
@@ -102,9 +104,9 @@ RSpec.describe Swarm::ConcurrenceExpression do
     it "merges child workitem into current workitem with deep merge" do
       allow(subject).to receive(:array_combination_method).and_return("special")
       allow(Swarm::Support).to receive(:deep_merge).
-        with(subject.workitem, :child_workitem, :combine_arrays => "special").
+        with(subject.workitem, :child_workitem, combine_arrays: "special").
         and_return(:the_new_workitem)
-      fake_child = double(:workitem => :child_workitem)
+      fake_child = double(workitem: :child_workitem)
       subject.merge_child_workitem(fake_child)
       expect(subject.workitem).to eq(:the_new_workitem)
     end
@@ -116,9 +118,9 @@ RSpec.describe Swarm::ConcurrenceExpression do
     end
 
     it "returns method from args" do
-      allow(subject).to receive(:arguments).and_return({"combine_arrays" => "override"})
+      allow(subject).to receive(:arguments).and_return({ "combine_arrays" => "override" })
       expect(subject.array_combination_method).to eq("override")
-      allow(subject).to receive(:arguments).and_return({"combine_arrays" => "concat"})
+      allow(subject).to receive(:arguments).and_return({ "combine_arrays" => "concat" })
       expect(subject.array_combination_method).to eq("concat")
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples "an interface with required implementations" do |methods|
   methods.each do |method_name, arg_count|
     it "raises an error if ##{method_name} not implemented yet" do

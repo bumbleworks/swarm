@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Volatile::Queue do
   let(:job) { instance_double(Swarm::Engine::Volatile::Job) }
-  subject { described_class.new(:name => "dummy_queue") }
+  subject { described_class.new(name: "dummy_queue") }
 
   after(:each) do
     described_class.instance_variable_set(:@tubes, {})
@@ -17,7 +19,7 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
   describe ".get_tube" do
     it "returns tube from tube list if name already registered" do
       allow(described_class).to receive(:tubes).
-        and_return({ :foo => :the_tube })
+        and_return({ foo: :the_tube })
       expect(described_class.get_tube(:foo)).to eq(:the_tube)
     end
 
@@ -51,14 +53,14 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
 
   describe "#reserve_job" do
     it "raises JobReservationFailed exception when no jobs available" do
-      allow(subject).to receive(:jobs).and_return([double(:available? => false)])
+      allow(subject).to receive(:jobs).and_return([double(available?: false)])
       expect {
         subject.reserve_job(:a_worker)
       }.to raise_error(described_class::JobReservationFailed)
     end
 
     it "raises JobReservationFailed exception when job already reserved" do
-      job = double(:available? => true)
+      job = double(available?: true)
       allow(subject).to receive(:jobs).and_return([job])
       allow(job).to receive(:reserve!).with(:a_worker).and_raise(Swarm::Engine::Job::AlreadyReservedError)
       expect {
@@ -68,9 +70,9 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
 
     it "reserves first available job with given client and returns job" do
       jobs = [
-        double(:available? => false),
-        double(:available? => true),
-        double(:available? => true)
+        double(available?: false),
+        double(available?: true),
+        double(available?: true)
       ]
       allow(subject).to receive(:jobs).and_return(jobs)
       expect(jobs[1]).to receive(:reserve!).with(:a_worker)
@@ -95,15 +97,15 @@ RSpec.describe Swarm::Engine::Volatile::Queue do
     end
   end
 
-  describe "#has_job?" do
+  describe "#job_exists?" do
     it "returns true if given job in job list" do
       allow(subject).to receive(:jobs).and_return([:job1, :job2])
-      expect(subject.has_job?(:job1)).to eq(true)
+      expect(subject.job_exists?(:job1)).to eq(true)
     end
 
     it "returns false if given job not in job list" do
       allow(subject).to receive(:jobs).and_return([:job1, :job2])
-      expect(subject.has_job?(:job3)).to eq(false)
+      expect(subject.job_exists?(:job3)).to eq(false)
     end
   end
 

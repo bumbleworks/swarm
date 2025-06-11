@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   class HiveDweller
     class MissingTypeError < StandardError; end
@@ -24,6 +26,7 @@ module Swarm
       unless unknown_arguments.empty?
         raise ArgumentError, "unknown keywords: #{unknown_arguments.join(', ')}"
       end
+
       args.each do |key, value|
         change_attribute(key, value, record: record_changes)
       end
@@ -56,7 +59,7 @@ module Swarm
     def save
       if new? || changed?
         @id ||= Swarm::Support.uuid_with_timestamp
-        storage[storage_id] = to_hash.merge(:updated_at => Time.now)
+        storage[storage_id] = to_hash.merge(updated_at: Time.now)
         reload!
       end
       self
@@ -70,8 +73,8 @@ module Swarm
 
     def to_hash
       hsh = {
-        :id => id,
-        :type => self.class.name
+        id: id,
+        type: self.class.name
       }
       hsh.merge(attributes)
     end
@@ -81,7 +84,7 @@ module Swarm
       self.class.columns.each do |column|
         instance_variable_set(:"@#{column}", hsh[column.to_s])
       end
-      self.class.associations.each do |name, metadata|
+      self.class.associations.each_key do |name|
         instance_variable_set(:"@#{name}", nil)
       end
       @changed_attributes = {}
@@ -102,19 +105,26 @@ module Swarm
 
       def set_columns(*args)
         args.each do |arg|
-          define_method("#{arg}=") { |value|
-            change_attribute(arg, value)
-          }
-
-          define_method(arg) {
-            val = instance_variable_get(:"@#{arg}")
-            if /_at$/.match(arg) && val.is_a?(String)
-              val = Time.parse(val)
-            end
-            val
-          }
+          define_setter(arg)
+          define_getter(arg)
         end
-        @columns = @columns | args
+        @columns |= args
+      end
+
+      def define_setter(arg)
+        define_method("#{arg}=") do |value|
+          change_attribute(arg, value)
+        end
+      end
+
+      def define_getter(arg)
+        define_method(arg) {
+          val = instance_variable_get(:"@#{arg}")
+          if /_at$/.match(arg) && val.is_a?(String)
+            val = Time.parse(val)
+          end
+          val
+        }
       end
 
       def one_to_many(association_name, class_name: nil, foreign_key: nil)
@@ -143,10 +153,11 @@ module Swarm
           memo = instance_variable_get(:"@#{association_name}")
           memo || begin
             key ||= :"#{association_name}_id"
-            associated_id = self.send(key)
+            associated_id = send(key)
             return nil unless associated_id
-            klass = Swarm::Support.constantize("#{class_name || association_name}")
-            instance_variable_set(:"@#{association_name}", klass.fetch(associated_id, :hive => hive))
+
+            klass = Swarm::Support.constantize((class_name || association_name).to_s)
+            instance_variable_set(:"@#{association_name}", klass.fetch(associated_id, hive: hive))
           end
         end
         @associations[association_name] = {
@@ -163,7 +174,7 @@ module Swarm
       end
 
       def storage_id_for_key(key)
-        if key.match(/^#{storage_type}\:/)
+        if key.match(/^#{storage_type}:/)
           key
         else
           "#{storage_type}:#{key}"
@@ -186,11 +197,12 @@ module Swarm
         hive.storage.ids_for_type(storage_type)
       end
 
-      def each(hive: Hive.default, subtypes: true, &block)
+      def each(hive: Hive.default, subtypes: true)
         return to_enum(__method__, hive: hive, subtypes: subtypes) unless block_given?
+
         ids(hive: hive).each do |id|
           object = fetch(id, hive: hive)
-          if (subtypes && object.is_a?(self)) || object.class == self
+          if (subtypes && object.is_a?(self)) || object.instance_of?(self)
             yield object
           end
         end
@@ -204,11 +216,10 @@ module Swarm
 
       def reify_from_hash(hsh, hive: Hive.default)
         Support.symbolize_keys!(hsh)
-        raise MissingTypeError.new(hsh.inspect) unless hsh[:type]
+        raise MissingTypeError, hsh.inspect unless hsh[:type]
+
         Swarm::Support.constantize(hsh.delete(:type)).new_from_storage(
-          hsh.merge(
-            :hive => hive
-          )
+          **hsh.merge(hive: hive)
         )
       end
     end

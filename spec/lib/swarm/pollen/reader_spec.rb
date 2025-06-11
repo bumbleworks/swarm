@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Pollen::Reader do
   let(:pollen) { File.read(fixture_path("#{process_type}.pollen")) }
   let(:json) { File.read(fixture_path("#{process_type}.json")) }
@@ -23,7 +25,7 @@ RSpec.describe Swarm::Pollen::Reader do
     let(:process_type) { "conditional_process" }
     it "returns JSON version of #to_hash" do
       expect(subject).to receive(:to_hash).
-        and_return(double(:to_json => :a_json_version))
+        and_return(double(to_json: :a_json_version))
       expect(subject.to_json).to eq(:a_json_version)
     end
   end

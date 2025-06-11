@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Swarm
   class Hive
     class IllegalDefaultError < StandardError; end
@@ -6,15 +8,17 @@ module Swarm
     class << self
       def default=(default)
         unless default.is_a?(self)
-          raise IllegalDefaultError.new("Default must be a Swarm::Hive")
+          raise IllegalDefaultError, "Default must be a Swarm::Hive"
         end
+
         @default = default
       end
 
       def default
         unless @default
-          raise NoDefaultSetError.new("No default Hive defined yet")
+          raise NoDefaultSetError, "No default Hive defined yet"
         end
+
         @default
       end
     end
@@ -48,8 +52,8 @@ module Swarm
 
     def queue(action, object)
       @work_queue.add_job({
-        :action => action,
-        :metadata => object.to_hash
+        action: action,
+        metadata: object.to_hash
       })
     end
 

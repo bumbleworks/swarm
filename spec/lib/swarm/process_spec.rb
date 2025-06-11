@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Process do
-  let(:params) { { :process_definition_id => '123', :workitem => "the workitem"} }
-  subject { described_class.create(params) }
+  let(:params) { { process_definition_id: '123', workitem: "the workitem" } }
+  subject { described_class.create(**params) }
 
   describe "#wait_until_finished" do
     it "waits until finished" do
@@ -11,7 +13,7 @@ RSpec.describe Swarm::Process do
     it "times out if not finished in time" do
       allow(subject).to receive(:finished?).and_return(false)
       expect {
-        subject.wait_until_finished(:timeout => 0.05)
+        subject.wait_until_finished(timeout: 0.05)
       }.to raise_error(Timeout::Error)
     end
   end
@@ -33,16 +35,16 @@ RSpec.describe Swarm::Process do
   end
 
   describe "#_launch" do
-    let(:root_expression) { instance_double(Swarm::SequenceExpression, :id => '123') }
+    let(:root_expression) { instance_double(Swarm::SequenceExpression, id: '123') }
     before(:each) do
       allow(Swarm::SequenceExpression).to receive(:create).
-        with({
-          :hive => hive,
-          :parent_id => subject.id,
-          :position => [0],
-          :workitem => "the workitem",
-          :process_id => subject.id
-        }).and_return(root_expression)
+        with(
+          hive: hive,
+          parent_id: subject.id,
+          position: [0],
+          workitem: "the workitem",
+          process_id: subject.id
+        ).and_return(root_expression)
     end
 
     it "creates the root expression and applies it" do
@@ -60,7 +62,7 @@ RSpec.describe Swarm::Process do
   describe "#node_at_position" do
     it "returns full tree from definition if position 0 requested" do
       allow(subject).to receive(:process_definition).
-        and_return(double(:tree => :the_tree))
+        and_return(double(tree: :the_tree))
       expect(subject.node_at_position(0)).to eq(:the_tree)
     end
 
@@ -139,7 +141,7 @@ RSpec.describe Swarm::Process do
 
   describe "#move_on_from" do
     it "sets the workitem to the given child expression's workitem and saves" do
-      expression = instance_double(Swarm::Expression, :workitem => "a_new_workitem")
+      expression = instance_double(Swarm::Expression, workitem: "a_new_workitem")
       subject.move_on_from(expression)
       expect(subject.reload!.workitem).to eq("a_new_workitem")
     end
@@ -148,14 +150,14 @@ RSpec.describe Swarm::Process do
       parent_expression = double(Swarm::Expression)
       allow(subject).to receive(:parent_expression).and_return(parent_expression)
       expect(parent_expression).to receive(:move_on_from).with(subject)
-      subject.move_on_from(double(Swarm::Expression, :workitem => "a_new_workitem"))
+      subject.move_on_from(double(Swarm::Expression, workitem: "a_new_workitem"))
     end
   end
 
   describe "#process_definition_name" do
     it "delegates to process_definition #name" do
       allow(subject).to receive(:process_definition).
-        and_return(double(:name => "A special process"))
+        and_return(double(name: "A special process"))
       expect(subject.process_definition_name).to eq("A special process")
     end
   end

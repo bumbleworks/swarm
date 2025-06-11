@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Storage::HashStorage do
   let(:hash) {
     {
@@ -23,7 +25,7 @@ RSpec.describe Swarm::Storage::HashStorage do
 
   describe "#ids_for_type" do
     it "returns all ids for given type" do
-      expect(subject.ids_for_type("foo")).to eq(["1", "2"])
+      expect(subject.ids_for_type("foo")).to eq(%w[1 2])
       expect(subject.ids_for_type("bar")).to eq(["8"])
     end
   end

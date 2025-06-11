@@ -1,44 +1,46 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Support do
   describe ".deep_merge" do
-    let(:h1) { { :foo => :bar, :baz => [1, 2, 3], :crayons => { :brand => :crayola, :smell => :yucky } } }
-    let(:h2) { { :baz => [3, 4], :crayons => { :number => 4, :smell => :so_good } } }
+    let(:h1) { { foo: :bar, baz: [1, 2, 3], crayons: { brand: :crayola, smell: :yucky } } }
+    let(:h2) { { baz: [3, 4], crayons: { number: 4, smell: :so_good } } }
     it "deep merges hashes and overrides arrays by default" do
       expect(described_class.deep_merge(h1, h2)).to eq({
-        :foo => :bar,
-        :baz => [3, 4],
-        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
+        foo: :bar,
+        baz: [3, 4],
+        crayons: { brand: :crayola, number: 4, smell: :so_good }
       })
     end
 
     it "concatenates arrays if requested" do
-      expect(described_class.deep_merge(h1, h2, :combine_arrays => :concat)).to eq({
-        :foo => :bar,
-        :baz => [1, 2, 3, 3, 4],
-        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
+      expect(described_class.deep_merge(h1, h2, combine_arrays: :concat)).to eq({
+        foo: :bar,
+        baz: [1, 2, 3, 3, 4],
+        crayons: { brand: :crayola, number: 4, smell: :so_good }
       })
     end
 
     it "reduces combined arrays to uniq values if requested" do
-      expect(described_class.deep_merge(h1, h2, :combine_arrays => :uniq)).to eq({
-        :foo => :bar,
-        :baz => [1, 2, 3, 4],
-        :crayons => { :brand => :crayola, :number => 4, :smell => :so_good }
+      expect(described_class.deep_merge(h1, h2, combine_arrays: :uniq)).to eq({
+        foo: :bar,
+        baz: [1, 2, 3, 4],
+        crayons: { brand: :crayola, number: 4, smell: :so_good }
       })
     end
 
     it "raises exception if invalid array combination method requested" do
       expect {
-        described_class.deep_merge(h1, h2, :combine_arrays => :iron_a_hat)
+        described_class.deep_merge(h1, h2, combine_arrays: :iron_a_hat)
       }.to raise_error(ArgumentError, "unknown array combination method: iron_a_hat")
     end
   end
 
   describe ".symbolize_keys" do
     it "returns copy of given hash with symbolized keys" do
-      hsh = { :fancy => { "blue" => "green"}, "what" => 42 }
+      hsh = { fancy: { "blue" => "green" }, "what" => 42 }
       new_hsh = described_class.symbolize_keys(hsh)
       expect(new_hsh).to eq({
-        :fancy => { "blue" => "green"}, :what => 42
+        fancy: { "blue" => "green" }, what: 42
       })
       expect(new_hsh).not_to eq(hsh)
     end
@@ -46,10 +48,10 @@ RSpec.describe Swarm::Support do
 
   describe ".symbolize_keys!" do
     it "symbolizes keys in given hash" do
-      hsh = { :fancy => { "blue" => "green"}, "what" => 42 }
+      hsh = { fancy: { "blue" => "green" }, "what" => 42 }
       described_class.symbolize_keys!(hsh)
       expect(hsh).to eq({
-        :fancy => { "blue" => "green"}, :what => 42
+        fancy: { "blue" => "green" }, what: 42
       })
     end
   end
@@ -91,6 +93,7 @@ RSpec.describe Swarm::Support do
       class Whatever
         Smoothies = 'tasty'
       end
+
       class Boojus
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Router do
   describe ".expression_class_for_node" do
     it "returns SequenceExpression when command is sequence" do

@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Queue do
   let(:job) { instance_double(Swarm::Engine::Job) }
   subject { described_class.new(name: "a queue") }
 
   it_behaves_like "an interface with required implementations",
-    {
-      prepare_for_work: 1,
-      add_job: 1,
-      reserve_job: 1,
-      clear: 0,
-      idle?: 0,
-      worker_count: 0
-    }
+                  {
+                    prepare_for_work: 1,
+                    add_job: 1,
+                    reserve_job: 1,
+                    clear: 0,
+                    idle?: 0,
+                    worker_count: 0
+                  }
 
   describe "#delete_job" do
     it "delegates #delete to given job" do

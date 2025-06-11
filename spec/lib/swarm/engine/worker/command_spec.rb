@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Engine::Worker::Command do
   let(:metadata) { { "foo" => "bar" } }
   let(:job_arguments) { { action: "fight", metadata: metadata } }
@@ -5,7 +7,7 @@ RSpec.describe Swarm::Engine::Worker::Command do
 
   describe ".from_job" do
     it "parses action and metadata from queued job and instantiates Worker::Command" do
-      job = double(:to_h => job_arguments)
+      job = double(to_h: job_arguments)
       expect(described_class.from_job(job, hive: hive)).to eq(subject)
     end
   end
@@ -15,7 +17,7 @@ RSpec.describe Swarm::Engine::Worker::Command do
       allow(subject).to receive(:object).and_return(:the_object)
       expect(subject.to_hash).to eq({
         action: "fight",
-        metadata: { :foo => "bar" },
+        metadata: { foo: "bar" },
         object: :the_object
       })
     end
@@ -30,7 +32,8 @@ RSpec.describe Swarm::Engine::Worker::Command do
     end
 
     it "calls observer callbacks before and after" do
-      foo_observer, bar_observer = double, double
+      foo_observer = double
+      bar_observer = double
       hive_dweller = double
       allow(subject).to receive(:object).and_return(hive_dweller)
       allow(subject).to receive(:observers).and_return([foo_observer, bar_observer])

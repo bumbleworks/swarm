@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::Storage::KeyValueStorage do
   let(:hash) { { "foo:1" => "le foo", "foo:2" => "la foo", "bar:8" => "barp" } }
   subject { described_class.new(hash) }
 
   it_behaves_like "an interface with required implementations",
-    {
-      all_of_type: 1,
-      ids_for_type: 1,
-      delete: 1,
-      truncate: 0
-    }
+                  {
+                    all_of_type: 1,
+                    ids_for_type: 1,
+                    delete: 1,
+                    truncate: 0
+                  }
 
   describe "#serialize" do
     it "returns jsonified value" do
-      value = double(:to_json => "scuba_gear")
+      value = double(to_json: "scuba_gear")
       expect(subject.serialize(value)).to eq("scuba_gear")
     end
 
@@ -53,7 +55,7 @@ RSpec.describe Swarm::Storage::KeyValueStorage do
       expect(
         subject.add_association("croutons", associated, owner: owner, class_name: "Salad::Crouton")
       ).to eq(associated)
-      expect(the_ids_array).to eq(["14", "15"])
+      expect(the_ids_array).to eq(%w[14 15])
     end
 
     it "raises exception if owner does not respond to key" do

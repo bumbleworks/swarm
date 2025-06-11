@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require_relative "branch_expression"
 
 module Swarm
   class ConditionalExpression < BranchExpression
-    alias_method :original_tree, :tree
+    alias original_tree tree
 
     def work
       if tree.empty?

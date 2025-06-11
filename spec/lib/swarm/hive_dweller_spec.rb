@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::HiveDweller do
   let(:test_class) {
     Class.new(described_class).tap { |klass|
@@ -9,10 +11,14 @@ RSpec.describe Swarm::HiveDweller do
   let(:updated_at) { Time.parse((Time.now - 1).to_s) }
 
   subject {
-    test_class.new_from_storage({
-      :hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth",
-      :created_at => created_at, :updated_at => updated_at
-    })
+    test_class.new_from_storage(
+      hive: hive,
+      id: "1234",
+      horse: "fire",
+      rabbits: "earth",
+      created_at: created_at,
+      updated_at: updated_at
+    )
   }
 
   before(:each) do
@@ -26,20 +32,29 @@ RSpec.describe Swarm::HiveDweller do
 
   describe "#attributes" do
     it "returns values for all columns" do
-      expect(subject.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => created_at, :updated_at => updated_at)
+      expect(subject.attributes).to eq(
+        horse: "fire",
+        rabbits: "earth",
+        created_at: created_at,
+        updated_at: updated_at
+      )
     end
 
     it "returns nil for any attributes not set" do
       test_class.set_columns :alabama
       expect(subject.attributes).to eq(
-        :horse => "fire", :rabbits => "earth", :alabama => nil, :created_at => created_at, :updated_at => updated_at
+        horse: "fire",
+        rabbits: "earth",
+        alabama: nil,
+        created_at: created_at,
+        updated_at: updated_at
       )
     end
   end
 
   describe "#new?" do
     it "returns true for instance without id" do
-      expect(test_class.new(:hive => hive).new?).to eq(true)
+      expect(test_class.new(hive: hive).new?).to eq(true)
     end
 
     it "returns false for instance with id" do
@@ -49,7 +64,7 @@ RSpec.describe Swarm::HiveDweller do
 
   describe "#changed?" do
     it "returns false if new" do
-      expect(test_class.new(:hive => hive).changed?).to eq(false)
+      expect(test_class.new(hive: hive).changed?).to eq(false)
     end
 
     it "returns false if no columns have changed" do
@@ -71,26 +86,28 @@ RSpec.describe Swarm::HiveDweller do
   describe "#save" do
     it "stores self in storage if change" do
       subject.horse = "pony"
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:1234", subject.to_hash.merge(:updated_at => Time.now))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:1234", subject.to_hash.merge(updated_at: Time.now))
       expect(subject).to receive(:reload!)
       subject.save
     end
 
     it "generates id before saving if nonexistent" do
-      allow(subject).to receive(:to_hash).and_return({ :foo => :bar })
+      allow(subject).to receive(:to_hash).and_return({ foo: :bar })
       subject.instance_variable_set(:@id, nil)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("123-345-567")
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:123-345-567", subject.to_hash.merge(:updated_at => Time.now))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:123-345-567",
+                                                 subject.to_hash.merge(updated_at: Time.now))
       expect(subject).to receive(:reload!)
       subject.save
     end
 
     it "saves if new" do
-      new_object = test_class.new(:hive => hive)
+      new_object = test_class.new(hive: hive)
       allow(Swarm::Support).to receive(:uuid_with_timestamp).
         and_return("9999")
-      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999", new_object.to_hash.merge(:id => "9999", :updated_at => Time.now))
+      expect(hive.storage).to receive(:[]=).with("AluminumHead:9999",
+                                                 new_object.to_hash.merge(id: "9999", updated_at: Time.now))
       expect(new_object).to receive(:reload!)
       new_object.save
     end
@@ -111,12 +128,12 @@ RSpec.describe Swarm::HiveDweller do
   describe "#to_hash" do
     it "returns attributes with id and type merged in" do
       expect(subject.to_hash).to eq({
-        :id => "1234",
-        :type => "Heads::AluminumHead",
-        :horse => "fire",
-        :rabbits => "earth",
-        :created_at => created_at,
-        :updated_at => updated_at
+        id: "1234",
+        type: "Heads::AluminumHead",
+        horse: "fire",
+        rabbits: "earth",
+        created_at: created_at,
+        updated_at: updated_at
       })
     end
   end
@@ -142,9 +159,9 @@ RSpec.describe Swarm::HiveDweller do
     it "clears associations" do
       association_class = double
       allow(association_class).to receive(:fetch).
-        with("12345", :hive => hive).and_return(:the_object)
+        with("12345", hive: hive).and_return(:the_object)
       allow(association_class).to receive(:fetch).
-        with("67890", :hive => hive).and_return(:the_other_object)
+        with("67890", hive: hive).and_return(:the_other_object)
       allow(Swarm::Support).to receive(:constantize).
         with("puppy").and_return(association_class)
 
@@ -162,27 +179,28 @@ RSpec.describe Swarm::HiveDweller do
 
   describe ".new" do
     it "returns a new instance with columns set" do
-      instance = test_class.new(:hive => hive, :horse => "fire", :rabbits => "earth")
-      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => nil, :updated_at => nil)
+      instance = test_class.new(hive: hive, horse: "fire", rabbits: "earth")
+      expect(instance.attributes).to eq(horse: "fire", rabbits: "earth", created_at: nil, updated_at: nil)
     end
 
     it "raises an ArgumentError if any arguments are not columns" do
       expect {
-        test_class.new(:hive => hive, :horse => "fire", :lemons => "sweet")
+        test_class.new(hive: hive, horse: "fire", lemons: "sweet")
       }.to raise_error(ArgumentError, "unknown keywords: lemons")
     end
 
     it "does not allow directly setting id" do
       expect {
-        test_class.new(:hive => hive, :id => "secret_hack", :horse => "fire")
+        test_class.new(hive: hive, id: "secret_hack", horse: "fire")
       }.to raise_error(ArgumentError, "unknown keywords: id")
     end
   end
 
   describe ".new_from_storage" do
     it "returns a new instance with id set" do
-      instance = test_class.new_from_storage(:hive => hive, :id => "1234", :horse => "fire", :rabbits => "earth", :created_at => created_at)
-      expect(instance.attributes).to eq(:horse => "fire", :rabbits => "earth", :created_at => created_at, :updated_at => nil)
+      instance = test_class.new_from_storage(hive: hive, id: "1234", horse: "fire", rabbits: "earth",
+                                             created_at: created_at)
+      expect(instance.attributes).to eq(horse: "fire", rabbits: "earth", created_at: created_at, updated_at: nil)
       expect(instance.id).to eq("1234")
     end
   end
@@ -202,7 +220,7 @@ RSpec.describe Swarm::HiveDweller do
         and_return(subject.to_hash)
       allow(test_class).to receive(:reify_from_hash).with(hive.storage["AluminumHead:1234"], hive: hive).
         and_return(subject)
-      expect(test_class.fetch("1234", :hive => hive)).to eq(subject)
+      expect(test_class.fetch("1234", hive: hive)).to eq(subject)
     end
   end
 
@@ -246,7 +264,7 @@ RSpec.describe Swarm::HiveDweller do
       allow(hive.storage).to receive(:load_associations).
         with(:spam_noodles, owner: subject, class_name: :spam_noodles, foreign_key: "ploo").
         and_return([:data1, :data2])
-      test_class.one_to_many :spam_noodles, :foreign_key => "ploo"
+      test_class.one_to_many :spam_noodles, foreign_key: "ploo"
       expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
     end
 
@@ -254,7 +272,7 @@ RSpec.describe Swarm::HiveDweller do
       allow(hive.storage).to receive(:load_associations).
         with(:spam_noodles, owner: subject, class_name: "MyUnclesTruck", foreign_key: nil).
         and_return([:data1, :data2])
-      test_class.one_to_many :spam_noodles, :class_name => "MyUnclesTruck"
+      test_class.one_to_many :spam_noodles, class_name: "MyUnclesTruck"
       expect(subject.spam_noodles).to eq([:noodle1, :noodle2])
     end
 
@@ -274,7 +292,7 @@ RSpec.describe Swarm::HiveDweller do
     before(:each) do
       allow(subject).to receive(:spam_noodle_id).and_return("spam_noodle_id")
       allow(association_class).to receive(:fetch).
-        with("spam_noodle_id", :hive => hive).and_return(:the_object)
+        with("spam_noodle_id", hive: hive).and_return(:the_object)
     end
 
     it "adds helper method to retrieve association" do
@@ -287,17 +305,17 @@ RSpec.describe Swarm::HiveDweller do
     it "allows for override of association key" do
       allow(subject).to receive(:elephantine_id).and_return("elephantine_id")
       allow(association_class).to receive(:fetch).
-        with("elephantine_id", :hive => hive).and_return(:the_object)
+        with("elephantine_id", hive: hive).and_return(:the_object)
       allow(Swarm::Support).to receive(:constantize).
         with("spam_noodle").and_return(association_class)
-      test_class.many_to_one :spam_noodle, :key => "elephantine_id"
+      test_class.many_to_one :spam_noodle, key: "elephantine_id"
       expect(subject.spam_noodle).to eq(:the_object)
     end
 
     it "allows for override of class_name" do
       allow(Swarm::Support).to receive(:constantize).
         with("MyUnclesTruck").and_return(association_class)
-      test_class.many_to_one :spam_noodle, :class_name => "MyUnclesTruck"
+      test_class.many_to_one :spam_noodle, class_name: "MyUnclesTruck"
       expect(subject.spam_noodle).to eq(:the_object)
     end
 
@@ -321,7 +339,7 @@ RSpec.describe Swarm::HiveDweller do
     it "returns all ids for storage type" do
       allow(hive.storage).to receive(:ids_for_type).with("AluminumHead").
         and_return(:all_the_ids)
-      expect(test_class.ids(:hive => hive)).to eq(:all_the_ids)
+      expect(test_class.ids(hive: hive)).to eq(:all_the_ids)
     end
   end
 
@@ -332,8 +350,8 @@ RSpec.describe Swarm::HiveDweller do
       allow(Swarm::Support).to receive(:constantize).with("a_great_type").
         and_return(klass_double)
       expect(klass_double).to receive(:new_from_storage).with({
-        :other_thing => "neat_thing",
-        :hive => hive
+        other_thing: "neat_thing",
+        hive: hive
       }).and_return(:the_item)
       allow(test_class).to receive(:name).and_return("a_great_type")
       expect(test_class.reify_from_hash(hash, hive: hive)).to eq(:the_item)
@@ -343,48 +361,48 @@ RSpec.describe Swarm::HiveDweller do
       bad_hash = { "not_type" => "darn_it_where_is_type" }
       expect {
         test_class.reify_from_hash(bad_hash, hive: hive)
-      }.to raise_error(described_class::MissingTypeError, { :not_type => "darn_it_where_is_type" }.inspect)
+      }.to raise_error(described_class::MissingTypeError, { not_type: "darn_it_where_is_type" }.inspect)
     end
   end
 
   describe ".all" do
     it "returns all values for storage type" do
       allow(hive.storage).to receive(:all_of_type).with("AluminumHead", subtypes: true).
-        and_return([double(:dup => :first_hash), double(:dup => :second_hash)])
+        and_return([double(dup: :first_hash), double(dup: :second_hash)])
       allow(test_class).to receive(:reify_from_hash).with(:first_hash, hive: hive).and_return(:first_object)
       allow(test_class).to receive(:reify_from_hash).with(:second_hash, hive: hive).and_return(:second_object)
-      expect(test_class.all(:hive => hive)).to eq([:first_object, :second_object])
+      expect(test_class.all(hive: hive)).to eq([:first_object, :second_object])
     end
   end
 
   describe ".each" do
     it "yields an instance for every id returned by .ids, if is_a? class" do
-      allow(test_class).to receive(:ids).with(:hive => hive).
-        and_return(["123", "456", "789", "boo"])
-      doubles = ["123", "456", "789"].map do |id|
+      allow(test_class).to receive(:ids).with(hive: hive).
+        and_return(%w[123 456 789 boo])
+      doubles = %w[123 456 789].map { |id|
         instance_double(test_class).tap { |double|
           allow(double).to receive(:is_a?).with(test_class).and_return(true)
-          allow(test_class).to receive(:fetch).with(id, :hive => hive).and_return(double)
+          allow(test_class).to receive(:fetch).with(id, hive: hive).and_return(double)
         }
-      end
-      allow(test_class).to receive(:fetch).with("boo", :hive => hive).and_return(double(:is_a? => false))
+      }
+      allow(test_class).to receive(:fetch).with("boo", hive: hive).and_return(double(is_a?: false))
       aggregation = []
-      test_class.each(:hive => hive) { |instance| aggregation << instance }
+      test_class.each(hive: hive) do |instance| aggregation << instance end
       expect(aggregation).to eq(doubles)
     end
 
     it "restricts to instances of class specifically if subtypes false" do
-      allow(test_class).to receive(:ids).with(:hive => hive).
-        and_return(["123", "456", "789", "boo"])
-      doubles = ["123", "456", "789"].map do |id|
-        instance_double(test_class, :class => test_class).tap { |double|
-          allow(test_class).to receive(:fetch).with(id, :hive => hive).and_return(double)
+      allow(test_class).to receive(:ids).with(hive: hive).
+        and_return(%w[123 456 789 boo])
+      doubles = %w[123 456 789].map { |id|
+        test_class.new.tap { |instance|
+          allow(test_class).to receive(:fetch).with(id, hive: hive).and_return(instance)
         }
-      end
-      sub_double = double(:class => "Nope", :is_a? => true)
-      allow(test_class).to receive(:fetch).with("boo", :hive => hive).and_return(sub_double)
+      }
+      sub_double = double(class: "Nope", is_a?: true)
+      allow(test_class).to receive(:fetch).with("boo", hive: hive).and_return(sub_double)
       aggregation = []
-      test_class.each(:hive => hive, :subtypes => false) { |instance| aggregation << instance }
+      test_class.each(hive: hive, subtypes: false) do |instance| aggregation << instance end
       expect(aggregation).to eq(doubles)
     end
   end

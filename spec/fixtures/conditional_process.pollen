@@ -32,7 +32,7 @@ sequence do
     trace "so you need a baseball bat"
   end
   concurrence unless: "ghosts != 'real'" do
-    trace "hoo boy"
+    trace "hoo boy", if: "what"
   end
   trace "and that is a fact"
 end

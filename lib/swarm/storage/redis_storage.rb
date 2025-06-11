@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "redis"
 require_relative "key_value_storage"
 
@@ -13,7 +15,7 @@ module Swarm
         if subtypes
           hsh.values
         else
-          hsh.select { |key, value| value["type"] == type }.values
+          hsh.select { |_key, value| value["type"] == type }.values
         end
       end
 

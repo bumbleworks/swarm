@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 RSpec.describe Swarm::ConditionalExpression do
   let(:branches) { { "true" => [:a], "false" => [:b] } }
 
   subject {
-    described_class.new_from_storage({
-      :id => 'foo',
-      :workitem => { 'foo' => 'bar' },
-      :process_id => '123',
-      :parent_id => '456'
-    })
+    described_class.new_from_storage(
+      id: 'foo',
+      workitem: { 'foo' => 'bar' },
+      process_id: '123',
+      parent_id: '456'
+    )
   }
 
   before(:each) do
@@ -35,7 +37,7 @@ RSpec.describe Swarm::ConditionalExpression do
   describe "#move_on_from" do
     it "sets workitem to child's workitem and replies" do
       expect(subject).to receive(:reply)
-      subject.move_on_from(double(:workitem => :a_workitem))
+      subject.move_on_from(double(workitem: :a_workitem))
       expect(subject.workitem).to eq(:a_workitem)
     end
   end
